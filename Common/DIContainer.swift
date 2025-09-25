@@ -34,6 +34,6 @@ extension DIContainer {
 extension DIContainer {
     func makeTaskDetailsModule(task: TodoItem) -> TaskDetailsViewController {
         let configurator = TaskDetailsConfigurator()
-        return configurator.configure(with: task)
+        return configurator.configure(with: task, storageService: makeStorageServices())
     }
 }

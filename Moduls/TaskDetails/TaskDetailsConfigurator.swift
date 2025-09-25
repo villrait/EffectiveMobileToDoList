@@ -8,11 +8,13 @@
 import UIKit
 
 class TaskDetailsConfigurator {
-    func configure(with task: TodoItem) -> TaskDetailsViewController {
+    func configure(with task: TodoItem, storageService: StorageServiceProtocol) -> TaskDetailsViewController {
         let viewController = TaskDetailsViewController()
         let presenter = TaskDetailsPresenter()
         let interactor = TaskDetailsInteractor()
         let router = TaskDetailsRouter()
+        
+        interactor.storageService = storageService
         
         viewController.presenter = presenter
         presenter.view = viewController
