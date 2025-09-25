@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0C8E917D2E855871008CB7D0 /* NetworkServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8E917C2E855871008CB7D0 /* NetworkServiceProtocol.swift */; };
+		0C8E917F2E85587F008CB7D0 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8E917E2E85587F008CB7D0 /* NetworkService.swift */; };
+		0C8E91812E855891008CB7D0 /* StorageServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8E91802E855891008CB7D0 /* StorageServiceProtocol.swift */; };
+		0C8E91832E85589A008CB7D0 /* CoreDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8E91822E85589A008CB7D0 /* CoreDataService.swift */; };
+		0C8E91852E8558CA008CB7D0 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8E91842E8558CA008CB7D0 /* TodoItem.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0CA098F82E854FE500D8340A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +32,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0C8E917C2E855871008CB7D0 /* NetworkServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceProtocol.swift; sourceTree = "<group>"; };
+		0C8E917E2E85587F008CB7D0 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		0C8E91802E855891008CB7D0 /* StorageServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageServiceProtocol.swift; sourceTree = "<group>"; };
+		0C8E91822E85589A008CB7D0 /* CoreDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataService.swift; sourceTree = "<group>"; };
+		0C8E91842E8558CA008CB7D0 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
 		0CA098DE2E854FDD00D8340A /* EffectiveMobileToDoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EffectiveMobileToDoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CA098F72E854FE500D8340A /* EffectiveMobileToDoListTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EffectiveMobileToDoListTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CA099012E854FE500D8340A /* EffectiveMobileToDoListUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EffectiveMobileToDoListUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,9 +98,78 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C8E91732E8554D9008CB7D0 /* Moduls */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Moduls;
+			sourceTree = "<group>";
+		};
+		0C8E91742E8554E9008CB7D0 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				0C8E91792E855833008CB7D0 /* Network */,
+				0C8E917B2E855851008CB7D0 /* Storage */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		0C8E91752E8554F4008CB7D0 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				0C8E91842E8558CA008CB7D0 /* TodoItem.swift */,
+			);
+			path = Entities;
+			sourceTree = "<group>";
+		};
+		0C8E91762E8554FF008CB7D0 /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "New Group";
+			sourceTree = "<group>";
+		};
+		0C8E91772E855519008CB7D0 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		0C8E91782E855522008CB7D0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		0C8E91792E855833008CB7D0 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				0C8E917C2E855871008CB7D0 /* NetworkServiceProtocol.swift */,
+				0C8E917E2E85587F008CB7D0 /* NetworkService.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		0C8E917B2E855851008CB7D0 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				0C8E91802E855891008CB7D0 /* StorageServiceProtocol.swift */,
+				0C8E91822E85589A008CB7D0 /* CoreDataService.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
 		0CA098D52E854FDD00D8340A = {
 			isa = PBXGroup;
 			children = (
+				0C8E91742E8554E9008CB7D0 /* Services */,
+				0C8E91782E855522008CB7D0 /* Resources */,
+				0C8E91772E855519008CB7D0 /* Common */,
+				0C8E91762E8554FF008CB7D0 /* New Group */,
+				0C8E91752E8554F4008CB7D0 /* Entities */,
+				0C8E91732E8554D9008CB7D0 /* Moduls */,
 				0CA098E02E854FDD00D8340A /* EffectiveMobileToDoList */,
 				0CA098FA2E854FE500D8340A /* EffectiveMobileToDoListTests */,
 				0CA099042E854FE500D8340A /* EffectiveMobileToDoListUITests */,
@@ -249,6 +331,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C8E91852E8558CA008CB7D0 /* TodoItem.swift in Sources */,
+				0C8E91812E855891008CB7D0 /* StorageServiceProtocol.swift in Sources */,
+				0C8E91832E85589A008CB7D0 /* CoreDataService.swift in Sources */,
+				0C8E917F2E85587F008CB7D0 /* NetworkService.swift in Sources */,
+				0C8E917D2E855871008CB7D0 /* NetworkServiceProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,7 +380,6 @@
 				INFOPLIST_FILE = EffectiveMobileToDoList/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
@@ -329,7 +415,6 @@
 				INFOPLIST_FILE = EffectiveMobileToDoList/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
