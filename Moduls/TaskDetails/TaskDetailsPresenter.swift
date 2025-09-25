@@ -10,6 +10,7 @@ import Foundation
 protocol TaskDetailsPresenterProtocol: AnyObject {
     func viewDidLoad()
     func saveTask(title: String, description: String?, isCompleted: Bool)
+    func taskSavedSuccessfully()
 }
 
 class TaskDetailsPresenter: TaskDetailsPresenterProtocol {
@@ -31,5 +32,16 @@ class TaskDetailsPresenter: TaskDetailsPresenterProtocol {
     
     func saveTask(title: String, description: String?, isCompleted: Bool) {
         print("Presenter: Сохраняю задачу - \(title)")
+        guard let task = task else { return }
+        interactor?.saveTask(
+            task, newTitle: title,
+            newDescription: description,
+            newIsCompleted: isCompleted
+        )
+    }
+    
+    func taskSavedSuccessfully() {
+        print("Presenter: Задача успешно сохранена")
+        router?.closeScreen()
     }
 }
