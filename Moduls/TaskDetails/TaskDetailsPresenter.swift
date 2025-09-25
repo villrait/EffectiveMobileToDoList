@@ -7,6 +7,25 @@
 
 import Foundation
 
-class TaskDetailsPresenter {
+protocol TaskDetailsPresenterProtocol: AnyObject {
+    func viewDidLoad()
+    func saveTasks(title: String, description: String?, isCompleted: Bool)
+}
+
+class TaskDetailsPresenter: TaskDetailsPresenterProtocol {
+    weak var view: TaskDetailsViewControllerProtocol?
+    var interactor: TaskDetailsInteractorProtocol?
+    var router: TaskDetailsRouterProtocol?
+    
+    var task: TodoItem?
+    
+    func viewDidLoad() {
+        print("Presenter: Экран деталей загружен")
+    }
+    
+    func saveTasks(title: String, description: String?, isCompleted: Bool) {
+        print("Presenter: Сохраняю задачу - \(title)")
+    }
+    
     
 }

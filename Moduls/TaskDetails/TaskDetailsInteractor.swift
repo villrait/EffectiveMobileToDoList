@@ -7,6 +7,10 @@
 
 import Foundation
 
-class TaskDetailsInteractor {
+protocol TaskDetailsInteractorProtocol: AnyObject {
     
+}
+
+class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
+    weak var presenter: TaskDetailsPresenterProtocol?
 }

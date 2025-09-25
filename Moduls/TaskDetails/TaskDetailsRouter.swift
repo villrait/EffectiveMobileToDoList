@@ -7,6 +7,10 @@
 
 import Foundation
 
-class TaskDetailsRouter {
+protocol TaskDetailsRouterProtocol: AnyObject {
     
+}
+
+class TaskDetailsRouter: TaskDetailsRouterProtocol {
+    weak var viewController: TaskDetailsViewControllerProtocol?
 }
