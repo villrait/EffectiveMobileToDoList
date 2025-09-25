@@ -21,6 +21,7 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         super.viewDidLoad()
         setupTableView()
         tableView.dataSource = self
+        presenter?.viewDidLoad()
     }
     
     private func setupTableView() {
