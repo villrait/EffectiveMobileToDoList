@@ -19,6 +19,14 @@ class TaskListPresenter: TaskListPresenterProtocol {
     var interactor: TaskListInteractorProtocol?
     var router: TaskListRouterProtocol?
     
+    private var tasks: [TodoItem] = []
+    
+    func tasksLoaded(_ tasks: [TodoItem]) {
+        print("Presenter: Получено \(tasks.count) задач")
+        self.tasks = tasks
+        view?.displayTasks(tasks)
+    }
+    
     func viewDidLoad() {
         print("Presenter: View загрузилась, запрашиваю данные...")
         interactor?.loadTask()
@@ -26,9 +34,5 @@ class TaskListPresenter: TaskListPresenterProtocol {
     
     func didSelectTask(at index: Int) {
         print("Presenter: Выбрана задача №\(index + 1)")
-    }
-    
-    func tasksLoaded(_ tasks: [TodoItem]) {
-        print("Presenter: Получено \(tasks.count) задач")
     }
 }

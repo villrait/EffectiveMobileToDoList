@@ -8,7 +8,7 @@
 import UIKit
 
 protocol TaskListViewControllerProtocol: AnyObject {
-    
+    func displayTasks(_ tasks: [TodoItem])
 }
 
 class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
@@ -16,6 +16,7 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     
     private let tableView = UITableView()
     private let cellIdentifier = "Cell"
+    private var tasks: [TodoItem] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,16 +31,25 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         tableView.frame = view.bounds
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
     }
+    
+    func displayTasks(_ tasks: [TodoItem]) {
+        self.tasks = tasks
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
 }
 
 extension TaskListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return tasks.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-        cell.textLabel?.text = "Задача \(indexPath.row + 1)"
+        let task = tasks[indexPath.row]
+        cell.textLabel?.text = task.title
+        cell.accessoryType = task.isCompleted ? .checkmark : .none
         return cell
     }
 }
