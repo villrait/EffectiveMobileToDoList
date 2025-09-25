@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+protocol StorageServiceProtocol {
+    func saveTodos(_ todos: [TodoItem])
+    func loadTodos() -> [TodoItem]
+}

@@ -6,3 +6,14 @@
 //
 
 import Foundation
+
+class CoreDataService: StorageServiceProtocol {
+    func saveTodos(_ todos: [TodoItem]) {
+        print("Saving \(todos.count) todos to CoreData")
+    }
+    
+    func loadTodos() -> [TodoItem] {
+        print("Loading todos from CoreData")
+        return []
+    }
+}
