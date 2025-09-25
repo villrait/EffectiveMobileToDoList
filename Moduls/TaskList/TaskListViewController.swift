@@ -10,6 +10,7 @@ import UIKit
 protocol TaskListViewControllerProtocol: AnyObject {
     func displayTasks(_ tasks: [TodoItem])
     func showLoading()
+    func showError(_ message: String)
 }
 
 class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
@@ -43,6 +44,16 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         
         refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
         tableView.refreshControl = refreshControl
+    }
+    
+    func showError(_ message: String) {
+        DispatchQueue.main.async {
+            self.activityIndicator.stopAnimating()
+            self.refreshControl.endRefreshing()
+            
+            let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+            alert.present(alert, animated: true)
+        }
     }
     
     func displayTasks(_ tasks: [TodoItem]) {

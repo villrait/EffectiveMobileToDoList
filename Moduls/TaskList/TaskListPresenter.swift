@@ -12,6 +12,7 @@ protocol TaskListPresenterProtocol: AnyObject {
     func didSelectTask(at index: Int)
     func tasksLoaded(_ tasks: [TodoItem])
     func refreshTasks()
+    func tasksLoadingFailed(_ error: Error)
 }
 
 class TaskListPresenter: TaskListPresenterProtocol {
@@ -26,6 +27,10 @@ class TaskListPresenter: TaskListPresenterProtocol {
         print("Presenter: View загрузилась, запрашиваю данные...")
         view?.showLoading()
         interactor?.loadTask()
+    }
+    
+    func tasksLoadingFailed(_ error: any Error) {
+        view?.showError("Не удалось загрузить задачи: \(error.localizedDescription)")
     }
     
     func refreshTasks() {

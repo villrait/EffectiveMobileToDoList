@@ -17,7 +17,8 @@ class TaskListInteractor: TaskListInteractorProtocol {
     var storageService: StorageServiceProtocol?
     
     func loadTask() {
-        print("Interactor: Загружаю задачи...")
+        print("Interactor: Загружаю задачи из сети...")
+        
         networkService?.fetchTodos { [weak self] result in
             switch result {
             case .success(let tasks):
@@ -28,7 +29,12 @@ class TaskListInteractor: TaskListInteractorProtocol {
             case .failure(let error):
                 print("Interactor: Ошибка загрузки: \(error)")
                 let localTasks = self?.storageService?.loadTodos() ?? []
-                self?.presenter?.tasksLoaded(localTasks)
+                
+                if localTasks.isEmpty {
+                    self?.presenter?.tasksLoaded(localTasks)
+                } else {
+                    self?.presenter?.tasksLoaded(localTasks)
+                }
             }
         }
     }
