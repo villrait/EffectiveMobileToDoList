@@ -7,10 +7,16 @@
 
 import Foundation
 
-struct TodoItem {
+struct TodoItem: Codable {
     let id: Int
     let title: String
-    let description: String?
     let isCompleted: Bool
-    let createdAt: Date
+    let userId: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case title = "todo"
+        case isCompleted = "completed"
+        case userId
+    }
 }
