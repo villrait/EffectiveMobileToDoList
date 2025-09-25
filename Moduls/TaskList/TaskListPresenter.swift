@@ -45,7 +45,9 @@ class TaskListPresenter: TaskListPresenterProtocol {
     }
     
     func didSelectTask(at index: Int) {
-        print("Presenter: Выбрана задача №\(index + 1)")
-        router?.showTaskDetails(TodoItem(id: 1, title: "Test", isCompleted: false, userId: 1))
+        guard index < tasks.count else { return }
+        let selectedTask = tasks[index]
+        print("Presenter: Выбрана задача - \(selectedTask.title)")
+        router?.showTaskDetails(selectedTask)
     }
 }

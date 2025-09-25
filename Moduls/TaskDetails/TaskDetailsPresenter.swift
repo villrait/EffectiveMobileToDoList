@@ -9,7 +9,7 @@ import Foundation
 
 protocol TaskDetailsPresenterProtocol: AnyObject {
     func viewDidLoad()
-    func saveTasks(title: String, description: String?, isCompleted: Bool)
+    func saveTask(title: String, description: String?, isCompleted: Bool)
 }
 
 class TaskDetailsPresenter: TaskDetailsPresenterProtocol {
@@ -21,11 +21,15 @@ class TaskDetailsPresenter: TaskDetailsPresenterProtocol {
     
     func viewDidLoad() {
         print("Presenter: Экран деталей загружен")
+        guard let task = task else { return }
+        view?.displayTask(
+            title: task.title,
+            description: "",
+            isCompleted: task.isCompleted
+        )
     }
     
-    func saveTasks(title: String, description: String?, isCompleted: Bool) {
+    func saveTask(title: String, description: String?, isCompleted: Bool) {
         print("Presenter: Сохраняю задачу - \(title)")
     }
-    
-    
 }

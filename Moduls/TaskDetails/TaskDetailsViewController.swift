@@ -8,7 +8,7 @@
 import UIKit
 
 protocol TaskDetailsViewControllerProtocol: AnyObject {
-    
+    func displayTask(title: String, description: String, isCompleted: Bool)
 }
 
 class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProtocol {
@@ -21,8 +21,8 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
+        setupUI()
+        presenter?.viewDidLoad()
     }
     
     private func setupUI() {
@@ -54,6 +54,12 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
+    }
+    
+    func displayTask(title: String, description: String, isCompleted: Bool) {
+        titleTextField.text = title
+        descriptionTextView.text = description
+        completedSwitch.isOn = isCompleted
     }
     
     @objc private func saveTapped() {
