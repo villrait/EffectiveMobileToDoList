@@ -11,6 +11,7 @@ protocol TaskListPresenterProtocol: AnyObject {
     func viewDidLoad()
     func didSelectTask(at index: Int)
     func tasksLoaded(_ tasks: [TodoItem])
+    func refreshTasks()
 }
 
 class TaskListPresenter: TaskListPresenterProtocol {
@@ -24,6 +25,11 @@ class TaskListPresenter: TaskListPresenterProtocol {
     func viewDidLoad() {
         print("Presenter: View загрузилась, запрашиваю данные...")
         view?.showLoading()
+        interactor?.loadTask()
+    }
+    
+    func refreshTasks() {
+        print("Presenter: Обновляю задачи...")
         interactor?.loadTask()
     }
     

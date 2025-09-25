@@ -19,6 +19,7 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     private let cellIdentifier = "Cell"
     private var tasks: [TodoItem] = []
     private let activityIndicator = UIActivityIndicatorView(style: .large)
+    private let refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,18 +40,30 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         view.addSubview(tableView)
         tableView.frame = view.bounds
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        tableView.refreshControl = refreshControl
     }
     
     func displayTasks(_ tasks: [TodoItem]) {
         self.tasks = tasks
         DispatchQueue.main.async {
             self.activityIndicator.stopAnimating()
+            self.refreshControl.endRefreshing()
             self.tableView.reloadData()
         }
     }
     
     func showLoading() {
         activityIndicator.startAnimating()
+    }
+    
+    func hideRefreshIndicator() {
+        refreshControl.endRefreshing()
+    }
+    
+    @objc private func refreshData() {
+        presenter?.refreshTasks()
     }
 }
 
