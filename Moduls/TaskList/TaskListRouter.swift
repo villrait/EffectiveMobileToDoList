@@ -7,6 +7,10 @@
 
 import Foundation
 
-class TaskListRouter {
+protocol TaskListRouterProtocol: AnyObject {
     
+}
+
+class TaskListRouter: TaskListRouterProtocol {
+    weak var viewController: TaskListViewController?
 }

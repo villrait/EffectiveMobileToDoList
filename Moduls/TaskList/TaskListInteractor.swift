@@ -7,6 +7,10 @@
 
 import Foundation
 
-class TaskListInteractor {
+protocol TaskListInteractorProtocol: AnyObject {
     
+}
+
+class TaskListInteractor: TaskListInteractorProtocol {
+    weak var presenter: TaskListPresenter?
 }

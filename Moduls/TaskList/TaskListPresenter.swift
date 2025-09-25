@@ -5,8 +5,14 @@
 //  Created by м on 25.09.2025.
 //
 
-import Foundation
+import UIKit
 
-class TaskListPresenter {
+protocol TaskListPresenterProtocol: AnyObject {
     
+}
+
+class TaskListPresenter: TaskListPresenterProtocol {
+    weak var view: TaskListViewController?
+    var interactor: TaskListInteractorProtocol?
+    var router: TaskListRouterProtocol?
 }

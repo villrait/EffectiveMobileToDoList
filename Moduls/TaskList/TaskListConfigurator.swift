@@ -5,7 +5,7 @@
 //  Created by м on 25.09.2025.
 //
 
-import Foundation
+import UIKit
 
 class TaskListConfigurator {
     func configure() -> TaskListViewController {

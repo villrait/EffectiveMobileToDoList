@@ -5,8 +5,12 @@
 //  Created by м on 25.09.2025.
 //
 
-import Foundation
+import UIKit
 
-class TaskListViewController {
+protocol TaskListViewControllerProtocol: AnyObject {
     
+}
+
+class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
+    var presenter: TaskListPresenterProtocol?
 }
