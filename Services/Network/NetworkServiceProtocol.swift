@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+protocol NetworkServiceProtocol {
+    func fetchTodos(completion: @escaping (Result<[TodoItem], Error>) -> Void)
+}
