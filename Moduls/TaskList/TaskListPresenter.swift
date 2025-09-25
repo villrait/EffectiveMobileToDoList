@@ -9,6 +9,7 @@ import UIKit
 
 protocol TaskListPresenterProtocol: AnyObject {
     func viewDidLoad()
+    func viewWillAppear()
     func didSelectTask(at index: Int)
     func tasksLoaded(_ tasks: [TodoItem])
     func refreshTasks()
@@ -26,6 +27,11 @@ class TaskListPresenter: TaskListPresenterProtocol {
     func viewDidLoad() {
         print("Presenter: View загрузилась, запрашиваю данные...")
         view?.showLoading()
+        interactor?.loadTask()
+    }
+    
+    func viewWillAppear() {
+        print("Presenter: Экран появляется, обновляю данные...")
         interactor?.loadTask()
     }
     
