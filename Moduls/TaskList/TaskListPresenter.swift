@@ -13,15 +13,16 @@ protocol TaskListPresenterProtocol: AnyObject {
 }
 
 class TaskListPresenter: TaskListPresenterProtocol {
+    weak var view: TaskListViewController?
+    var interactor: TaskListInteractorProtocol?
+    var router: TaskListRouterProtocol?
+    
     func viewDidLoad() {
         print("Presenter: View загрузилась, запрашиваю данные...")
+        interactor?.loadTask()
     }
     
     func didSelectTask(at index: Int) {
         print("Presenter: Выбрана задача №\(index + 1)")
     }
-    
-    weak var view: TaskListViewController?
-    var interactor: TaskListInteractorProtocol?
-    var router: TaskListRouterProtocol?
 }

@@ -8,9 +8,13 @@
 import Foundation
 
 protocol TaskListInteractorProtocol: AnyObject {
-    
+    func loadTask()
 }
 
 class TaskListInteractor: TaskListInteractorProtocol {
     weak var presenter: TaskListPresenter?
+    
+    func loadTask() {
+        print("Interactor: Загружаю задачи...")
+    }
 }
