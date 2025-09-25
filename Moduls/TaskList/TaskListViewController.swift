@@ -9,6 +9,7 @@ import UIKit
 
 protocol TaskListViewControllerProtocol: AnyObject {
     func displayTasks(_ tasks: [TodoItem])
+    func showLoading()
 }
 
 class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
@@ -17,13 +18,21 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     private let tableView = UITableView()
     private let cellIdentifier = "Cell"
     private var tasks: [TodoItem] = []
+    private let activityIndicator = UIActivityIndicatorView(style: .large)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
+        setupActivityIndicator()
         tableView.dataSource = self
         tableView.delegate = self
         presenter?.viewDidLoad()
+    }
+    
+    private func setupActivityIndicator() {
+        view.addSubview(activityIndicator)
+        activityIndicator.center = view.center
+        activityIndicator.hidesWhenStopped = true
     }
     
     private func setupTableView() {
@@ -35,8 +44,13 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     func displayTasks(_ tasks: [TodoItem]) {
         self.tasks = tasks
         DispatchQueue.main.async {
+            self.activityIndicator.stopAnimating()
             self.tableView.reloadData()
         }
+    }
+    
+    func showLoading() {
+        activityIndicator.startAnimating()
     }
 }
 

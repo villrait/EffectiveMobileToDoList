@@ -21,15 +21,16 @@ class TaskListPresenter: TaskListPresenterProtocol {
     
     private var tasks: [TodoItem] = []
     
+    func viewDidLoad() {
+        print("Presenter: View загрузилась, запрашиваю данные...")
+        view?.showLoading()
+        interactor?.loadTask()
+    }
+    
     func tasksLoaded(_ tasks: [TodoItem]) {
         print("Presenter: Получено \(tasks.count) задач")
         self.tasks = tasks
         view?.displayTasks(tasks)
-    }
-    
-    func viewDidLoad() {
-        print("Presenter: View загрузилась, запрашиваю данные...")
-        interactor?.loadTask()
     }
     
     func didSelectTask(at index: Int) {
