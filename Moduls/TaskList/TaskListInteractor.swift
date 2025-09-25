@@ -13,8 +13,13 @@ protocol TaskListInteractorProtocol: AnyObject {
 
 class TaskListInteractor: TaskListInteractorProtocol {
     weak var presenter: TaskListPresenter?
+    var networkService: NetworkServiceProtocol?
+    var storageService: StorageServiceProtocol?
     
     func loadTask() {
         print("Interactor: Загружаю задачи...")
+        networkService?.fetchTodos { result in
+            //
+        }
     }
 }

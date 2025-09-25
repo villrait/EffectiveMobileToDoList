@@ -24,6 +24,9 @@ class DIContainer {
 extension DIContainer {
     func makeTaskListModule() -> TaskListViewController {
         let configurator = TaskListConfigurator()
-        return configurator.configure()
+        return configurator.configure(
+            networkService: makeNetworkService(),
+            storageService: makeStorageServices()
+        )
     }
 }

@@ -8,11 +8,18 @@
 import UIKit
 
 class TaskListConfigurator {
-    func configure() -> TaskListViewController {
+    func configure(
+        networkService: NetworkServiceProtocol,
+        storageService: StorageServiceProtocol
+    ) -> TaskListViewController {
+        
         let viewController = TaskListViewController()
         let presenter = TaskListPresenter()
         let interactor = TaskListInteractor()
         let router = TaskListRouter()
+        
+        interactor.networkService = networkService
+        interactor.storageService = storageService
         
         viewController.presenter = presenter
         presenter.view = viewController
