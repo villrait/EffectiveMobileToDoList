@@ -18,7 +18,7 @@ class TaskListPresenter: TaskListPresenterProtocol {
     }
     
     func didSelectTask(at index: Int) {
-        print("Presenter: Выбрана задача №\(index)")
+        print("Presenter: Выбрана задача №\(index + 1)")
     }
     
     weak var view: TaskListViewController?

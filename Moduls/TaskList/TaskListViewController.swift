@@ -21,6 +21,7 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         super.viewDidLoad()
         setupTableView()
         tableView.dataSource = self
+        tableView.delegate = self
         presenter?.viewDidLoad()
     }
     
@@ -40,5 +41,12 @@ extension TaskListViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = "Задача \(indexPath.row + 1)"
         return cell
+    }
+}
+
+extension TaskListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        presenter?.didSelectTask(at: indexPath.row)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
