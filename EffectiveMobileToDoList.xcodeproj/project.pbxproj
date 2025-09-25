@@ -123,8 +123,8 @@
 		0C8E91732E8554D9008CB7D0 /* Moduls */ = {
 			isa = PBXGroup;
 			children = (
-				0C8E92882E85C590008CB7D0 /* TaskDetails */,
 				0C8E92512E85629C008CB7D0 /* TaskList */,
+				0C8E92882E85C590008CB7D0 /* TaskDetails */,
 			);
 			path = Moduls;
 			sourceTree = "<group>";
