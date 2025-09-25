@@ -20,3 +20,10 @@ class DIContainer {
         return storageService
     }
 }
+
+extension DIContainer {
+    func makeTaskListModule() -> TaskListViewController {
+        let configurator = TaskListConfigurator()
+        return configurator.configure()
+    }
+}
