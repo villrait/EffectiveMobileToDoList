@@ -18,8 +18,18 @@ class TaskListInteractor: TaskListInteractorProtocol {
     
     func loadTask() {
         print("Interactor: Загружаю задачи...")
-        networkService?.fetchTodos { result in
-            //
+        networkService?.fetchTodos { [weak self] result in
+            switch result {
+            case .success(let tasks):
+                print("Interactor: Получено \(tasks.count) задач из API")
+                self?.storageService?.saveTodos(tasks)
+                self?.presenter?.tasksLoaded(tasks)
+                
+            case .failure(let error):
+                print("Interactor: Ошибка загрузки: \(error)")
+                let localTasks = self?.storageService?.loadTodos() ?? []
+                self?.presenter?.tasksLoaded(localTasks)
+            }
         }
     }
 }

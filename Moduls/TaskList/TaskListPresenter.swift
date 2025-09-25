@@ -10,9 +10,11 @@ import UIKit
 protocol TaskListPresenterProtocol: AnyObject {
     func viewDidLoad()
     func didSelectTask(at index: Int)
+    func tasksLoaded(_ tasks: [TodoItem])
 }
 
 class TaskListPresenter: TaskListPresenterProtocol {
+    
     weak var view: TaskListViewController?
     var interactor: TaskListInteractorProtocol?
     var router: TaskListRouterProtocol?
@@ -24,5 +26,9 @@ class TaskListPresenter: TaskListPresenterProtocol {
     
     func didSelectTask(at index: Int) {
         print("Presenter: Выбрана задача №\(index + 1)")
+    }
+    
+    func tasksLoaded(_ tasks: [TodoItem]) {
+        print("Presenter: Получено \(tasks.count) задач")
     }
 }
