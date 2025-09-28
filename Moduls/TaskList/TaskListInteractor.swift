@@ -9,6 +9,7 @@ import Foundation
 
 protocol TaskListInteractorProtocol: AnyObject {
     func loadTask()
+    func refreshFromNetwork()
 }
 
 class TaskListInteractor: TaskListInteractorProtocol {
@@ -17,6 +18,13 @@ class TaskListInteractor: TaskListInteractorProtocol {
     var storageService: StorageServiceProtocol?
     
     func loadTask() {
+        print("Interactor: Загружаю задачи из БД...")
+
+        let localTasks = storageService?.loadTodos() ?? []
+        presenter?.tasksLoaded(localTasks)
+    }
+    
+    func refreshFromNetwork() {
         print("Interactor: Загружаю задачи из сети...")
         
         networkService?.fetchTodos { [weak self] result in

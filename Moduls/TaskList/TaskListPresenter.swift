@@ -25,23 +25,23 @@ class TaskListPresenter: TaskListPresenterProtocol {
     private var tasks: [TodoItem] = []
     
     func viewDidLoad() {
-        print("Presenter: View загрузилась, запрашиваю данные...")
-        view?.showLoading()
+        print("Presenter: View загрузилась, показываю локальные данные...")
         interactor?.loadTask()
     }
     
+    func refreshTasks() {
+        print("Presenter: Принудительное обновление из сети...")
+        view?.showLoading()
+        interactor?.refreshFromNetwork()
+    }
+    
     func viewWillAppear() {
-        print("Presenter: Экран появляется, обновляю данные...")
+        print("Presenter: Экран появляется, обновляю локальные данные...")
         interactor?.loadTask()
     }
     
     func tasksLoadingFailed(_ error: any Error) {
         view?.showError("Не удалось загрузить задачи: \(error.localizedDescription)")
-    }
-    
-    func refreshTasks() {
-        print("Presenter: Обновляю задачи...")
-        interactor?.loadTask()
     }
     
     func tasksLoaded(_ tasks: [TodoItem]) {

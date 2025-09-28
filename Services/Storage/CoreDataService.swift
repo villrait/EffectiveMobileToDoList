@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreData
 
 class CoreDataService: StorageServiceProtocol {
     func saveTodos(_ todos: [TodoItem]) {
