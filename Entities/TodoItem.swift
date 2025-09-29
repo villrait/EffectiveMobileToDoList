@@ -12,6 +12,31 @@ struct TodoItem: Codable {
     let title: String
     let isCompleted: Bool
     let userId: Int
+    let createdAt: Date
+    var description: String?
+    
+    init(id: Int,
+         title: String,
+         isCompleted: Bool = false,
+         userId: Int = 1,
+         description: String? = nil) {
+        self.id = id
+        self.title = title
+        self.isCompleted = isCompleted
+        self.userId = userId
+        self.createdAt = Date()
+        self.description = description
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(Int.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        isCompleted = try container.decode(Bool.self, forKey: .isCompleted)
+        userId = try container.decode(Int.self, forKey: .userId)
+        createdAt = Date()
+        description = nil
+    }
     
     enum CodingKeys: String, CodingKey {
         case id
