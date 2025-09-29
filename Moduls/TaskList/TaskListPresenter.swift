@@ -15,6 +15,7 @@ protocol TaskListPresenterProtocol: AnyObject {
     func refreshTasks()
     func tasksLoadingFailed(_ error: Error)
     func updateTaskCompletion(at index: Int, isCompleted: Bool)
+    func editTask(at index: Int)
 }
 
 class TaskListPresenter: TaskListPresenterProtocol {
@@ -57,6 +58,13 @@ class TaskListPresenter: TaskListPresenterProtocol {
         DispatchQueue.main.async{
             self.view?.displayTasks(tasks)
         }
+    }
+    
+    func editTask(at index: Int) {
+        guard index < tasks.count else { return }
+        let selectedTask = tasks[index]
+        print("Presenter: Редактируем задачу - \(selectedTask.title)")
+        router?.showTaskDetailsForEditing(selectedTask)
     }
     
     func didSelectTask(at index: Int) {

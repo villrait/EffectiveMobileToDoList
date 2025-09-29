@@ -199,7 +199,7 @@ extension TaskListViewController: UITableViewDelegate {
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
             
             let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
-                self.presenter?.didSelectTask(at: indexPath.row)
+                self.presenter?.editTask(at: indexPath.row)
             }
             
             let shareAction = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { _ in
