@@ -40,6 +40,8 @@ class TaskCell: UITableViewCell {
         return $0
     }(UIView())
     
+    var onCheckboxTapped: ((Bool) -> Void)?
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -90,13 +92,24 @@ class TaskCell: UITableViewCell {
         ])
     }
     
-    @objc private func checkButtonTapped() {
-        checkButton.isSelected.toggle()
-        updateTitleStrikeThrough()
+    private func updateTitleStrikeThrough() {
+        let text = titleLabel.text ?? ""
+        
+        let attributeString = NSMutableAttributedString(string: text)
+        
+        if checkButton.isSelected {
+            attributeString.addAttribute(.strikethroughStyle, value: 1, range: NSRange(location: 0, length: attributeString.length))
+        } else {
+            attributeString.removeAttribute(.strikethroughStyle, range: NSRange(location: 0, length: attributeString.length))
+        }
+        titleLabel.attributedText = attributeString
     }
     
     func configure(with task: TodoItem) {
-        titleLabel.text = task.title
+        let cleanText = task.title
+        let cleanAttributedString = NSAttributedString(string: cleanText)
+        titleLabel.attributedText = cleanAttributedString
+        
         descriptionLabel.text = task.description ?? "Нет описания"
         
         let formatter = DateFormatter()
@@ -107,15 +120,9 @@ class TaskCell: UITableViewCell {
         updateTitleStrikeThrough()
     }
     
-    private func updateTitleStrikeThrough() {
-        let attributeString = NSMutableAttributedString(string: titleLabel.text ?? "")
-        
-        if checkButton.isSelected {
-            attributeString.addAttribute(.strikethroughStyle, value: 1, range: NSRange(location: 0, length: attributeString.length))
-        } else {
-            attributeString.removeAttribute(.strikethroughStyle, range: NSRange(location: 0, length: attributeString.length))
-        }
-        titleLabel.attributedText = attributeString
+    @objc private func checkButtonTapped() {
+        checkButton.isSelected.toggle()
+        updateTitleStrikeThrough()
+        onCheckboxTapped?(checkButton.isSelected)
     }
-    
 }

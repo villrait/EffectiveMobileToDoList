@@ -19,6 +19,11 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     private var tasks: [TodoItem] = []
     private let cellIdentifier = "TaskCell"
     
+    private let refreshControl: UIRefreshControl = {
+        $0.attributedTitle = NSAttributedString(string: "Загрузка из сети...")
+        return $0
+    }(UIRefreshControl())
+    
     private let titleLabel: UILabel = {
         $0.text = "Задачи"
         $0.font = UIFont.systemFont(ofSize: 34, weight: .bold)
@@ -84,8 +89,12 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         bottomPanel.addSubview(tasksCountLabel)
         bottomPanel.addSubview(addButton)
         
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        
         tableView.dataSource = self
         tableView.delegate = self
+        
+        tableView.refreshControl = refreshControl
         
         tableView.register(TaskCell.self, forCellReuseIdentifier: cellIdentifier)
         
@@ -123,16 +132,13 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         ])
     }
     
-    @objc private func addTaskTapped() {
-        //
-        print("Add task tapped")
-    }
-    
     func displayTasks(_ tasks: [TodoItem]) {
         self.tasks = tasks
         DispatchQueue.main.async {
             self.tasksCountLabel.text = "\(tasks.count) задач"
             self.tableView.reloadData()
+            self.refreshControl.endRefreshing()
+            self.refreshControl.attributedTitle = NSAttributedString(string: "Последнее обновление: \(Date().formatted())")
         }
     }
     
@@ -145,19 +151,51 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
+    
+    @objc private func addTaskTapped() {
+        //
+        print("Add task tapped")
+    }
+    
+    @objc private func refreshData() {
+        print("Refresh triggered")
+        presenter?.refreshTasks()
+    }
 }
 
 extension TaskListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
         return tasks.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! TaskCell
         
         let task = tasks[indexPath.row]
+        
         cell.configure(with: task)
+        
+        cell.onCheckboxTapped = { [weak self] isCompleted in
+            self?.updateTaskCompletion(at: indexPath.row, isCompleted: isCompleted)
+        }
+        
         return cell
+    }
+    
+    private func updateTaskCompletion(at index: Int, isCompleted: Bool) {
+        guard index < tasks.count else { return }
+        var task = tasks[index]
+        
+        let updatedTask = TodoItem(
+            id: task.id,
+            title: task.title,
+            isCompleted: isCompleted,
+            userId: task.userId,
+            description: task.description
+        )
+        print("Task \(task.title) completion updated to: \(isCompleted)")
     }
 }
 
