@@ -164,4 +164,34 @@ extension TaskListViewController: UITableViewDelegate {
         presenter?.didSelectTask(at: indexPath.row)
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            
+            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+                self.presenter?.didSelectTask(at: indexPath.row)
+            }
+            
+            let shareAction = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { _ in
+                self.shareTask(at: indexPath.row)
+            }
+            
+            let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash")) { _ in
+                self.deleteTask(at: indexPath.row)
+            }
+            
+            return UIMenu(title: "", children: [editAction, shareAction, deleteAction])
+        }
+    }
+    
+    private func shareTask(at index: Int) {
+        let task = tasks[index]
+        let text = "Задача: \(task.title)"
+        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        present(activityVC, animated: true)
+    }
+    
+    private func deleteTask(at index: Int) {
+        print("Delete task at index: \(index)")
+    }
 }
