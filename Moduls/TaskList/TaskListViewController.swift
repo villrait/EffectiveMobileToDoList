@@ -216,9 +216,24 @@ extension TaskListViewController: UITableViewDelegate {
     
     private func shareTask(at index: Int) {
         let task = tasks[index]
-        let text = "Задача: \(task.title)"
-        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        
+        var shareText = "📋 \(task.title)"
+        
+        if let description = task.description, !description.isEmpty {
+            shareText += "\n\n\(description)"
+        }
+        
+        shareText += "\n\n📅 Создано: \(formatDate(task.createdAt))"
+        shareText += "\n✅ Статус: \(task.isCompleted ? "Выполнено" : "Не выполнено")"
+        
+        let activityVC = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
         present(activityVC, animated: true)
+    }
+    
+    private func formatDate(_ date: Date) -> String {
+        let formater = DateFormatter()
+        formater.dateFormat = "dd.MM.yyyy"
+        return formater.string(from: date)
     }
     
     private func deleteTask(at index: Int) {
