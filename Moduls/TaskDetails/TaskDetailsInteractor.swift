@@ -26,13 +26,13 @@ class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
                 title: newTitle,
                 isCompleted: newIsCompleted,
                 userId: task.userId,
-                description: task.description
+                description: newDescription
             )
             updatedTasks[index] = updatedTask
         }
         
         storageService?.saveTodos(updatedTasks)
-        print("Interactor: Задача обновлена - \(newTitle)")
+        print("Interactor: Задача обновлена - \(newTitle), описание: \(newDescription ?? "nil")")
         presenter?.taskSavedSuccessfully()
     }
 }
