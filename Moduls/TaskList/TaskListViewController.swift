@@ -41,7 +41,7 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     
     private let tableView: UITableView = {
         $0.separatorStyle = .none
-        $0.rowHeight = 80
+        $0.rowHeight = UITableView.automaticDimension
         $0.translatesAutoresizingMaskIntoConstraints = false
         return $0
     }(UITableView())
