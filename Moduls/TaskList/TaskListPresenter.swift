@@ -16,6 +16,7 @@ protocol TaskListPresenterProtocol: AnyObject {
     func tasksLoadingFailed(_ error: Error)
     func updateTaskCompletion(at index: Int, isCompleted: Bool)
     func editTask(at index: Int)
+    func deleteTask(at index: Int)
 }
 
 class TaskListPresenter: TaskListPresenterProtocol {
@@ -72,5 +73,12 @@ class TaskListPresenter: TaskListPresenterProtocol {
         let selectedTask = tasks[index]
         print("Presenter: Выбрана задача - \(selectedTask.title)")
         router?.showTaskDetails(selectedTask)
+    }
+    
+    func deleteTask(at index: Int) {
+        guard index < tasks.count else { return }
+        let task = tasks[index]
+        print("Presenter: Удаляем задачу - \(task.title)")
+        interactor?.deleteTask(task)
     }
 }

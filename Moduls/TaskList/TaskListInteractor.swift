@@ -11,6 +11,7 @@ protocol TaskListInteractorProtocol: AnyObject {
     func loadTask()
     func refreshFromNetwork()
     func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool)
+    func deleteTask(_ task: TodoItem)
 }
 
 class TaskListInteractor: TaskListInteractorProtocol {
@@ -53,20 +54,36 @@ class TaskListInteractor: TaskListInteractorProtocol {
     }
     
     func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool) {
-        let updatedTask = TodoItem(
-            id: task.id,
-            title: task.title,
-            isCompleted: isCompleted,
-            userId: task.userId,
-            description: task.description
-        )
-        
         
         var currentTasks = storageService?.loadTodos() ?? []
+        
         if let index = currentTasks.firstIndex(where: { $0.id == task.id }) {
+            let updatedTask = TodoItem(
+                id: task.id,
+                title: task.title,
+                isCompleted: isCompleted,
+                userId: task.userId,
+                description: task.description
+            )
+            
             currentTasks[index] = updatedTask
+            
             storageService?.saveTodos(currentTasks)
             print("Interactor: Task completion updated - \(task.title): \(isCompleted)")
+            
+            presenter?.tasksLoaded(currentTasks)
         }
+    }
+    
+    func deleteTask(_ task: TodoItem) {
+        var currentTasks = storageService?.loadTodos() ?? []
+        
+        currentTasks.removeAll { $0.id == task.id }
+        
+        storageService?.saveTodos(currentTasks)
+        print("Interactor: Задача удалена - \(task.title)")
+        
+        let updatedTasks = storageService?.loadTodos() ?? []
+        presenter?.tasksLoaded(updatedTasks)
     }
 }
