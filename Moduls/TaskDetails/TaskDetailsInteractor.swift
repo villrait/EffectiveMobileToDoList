@@ -20,7 +20,7 @@ class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
             id: task.id,
             title: newTitle,
             isCompleted: newIsCompleted,
-            userId: task.userId
+            description: task.description
         )
         
         storageService?.saveTodos([updatedTask])
