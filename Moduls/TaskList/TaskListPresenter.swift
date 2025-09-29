@@ -47,7 +47,9 @@ class TaskListPresenter: TaskListPresenterProtocol {
     func tasksLoaded(_ tasks: [TodoItem]) {
         print("Presenter: Получено \(tasks.count) задач")
         self.tasks = tasks
-        view?.displayTasks(tasks)
+        DispatchQueue.main.async{
+            self.view?.displayTasks(tasks)
+        }
     }
     
     func didSelectTask(at index: Int) {

@@ -130,8 +130,10 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     
     func displayTasks(_ tasks: [TodoItem]) {
         self.tasks = tasks
-        tasksCountLabel.text = "\(tasks.count) задач"
-        tableView.reloadData()
+        DispatchQueue.main.async {
+            self.tasksCountLabel.text = "\(tasks.count) задач"
+            self.tableView.reloadData()
+        }
     }
     
     func showLoading() {
