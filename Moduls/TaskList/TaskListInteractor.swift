@@ -22,7 +22,6 @@ class TaskListInteractor: TaskListInteractorProtocol {
         print("Interactor: Загружаю задачи из БД...")
         
         let localTasks = storageService?.loadTodos() ?? []
-        let sortedTasks = localTasks.sorted { $0.createdAt > $1.createdAt }
         
         if localTasks.isEmpty {
             print("Interactor: БД пустая, загружаю из сети...")
@@ -40,7 +39,6 @@ class TaskListInteractor: TaskListInteractorProtocol {
             switch result {
             case .success(let tasks):
                 print("Interactor: Получено \(tasks.count) задач из API")
-                let sortedTasks = tasks.sorted { $0.createdAt > $1.createdAt }
                 self?.storageService?.saveTodos(tasks)
                 let updateTasks = self?.storageService?.loadTodos() ?? []
                 self?.presenter?.tasksLoaded(updateTasks)
