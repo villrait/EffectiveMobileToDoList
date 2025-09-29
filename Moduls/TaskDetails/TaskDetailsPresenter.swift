@@ -17,16 +17,19 @@ class TaskDetailsPresenter: TaskDetailsPresenterProtocol {
     weak var view: TaskDetailsViewControllerProtocol?
     var interactor: TaskDetailsInteractorProtocol?
     var router: TaskDetailsRouterProtocol?
+    var isEditMode: Bool = false
     
     var task: TodoItem?
     
     func viewDidLoad() {
-        print("Presenter: Экран деталей загружен")
+        print("Presenter: Экран деталей загружен, режим: \(isEditMode ? "редактирование" : "просмотр")")
         guard let task = task else { return }
+        print("Presenter: Task description - \(task.description ?? "nil")")
         view?.displayTask(
             title: task.title,
-            description: "",
-            isCompleted: task.isCompleted
+            taskDescription: task.description ?? "",
+            isCompleted: task.isCompleted,
+            isEditMode: isEditMode
         )
     }
     

@@ -8,7 +8,7 @@
 import UIKit
 
 protocol TaskDetailsViewControllerProtocol: AnyObject {
-    func displayTask(title: String, description: String, isCompleted: Bool, isEditMode: Bool)
+    func displayTask(title: String, taskDescription: String, isCompleted: Bool, isEditMode: Bool)
     func setupEditMode(_ isEditMode: Bool)
 }
 
@@ -104,21 +104,24 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
         saveButton.action = #selector(saveTapped)
     }
     
-    func displayTask(title: String, description: String, isCompleted: Bool, isEditMode: Bool) {
+    func displayTask(title: String, taskDescription: String, isCompleted: Bool, isEditMode: Bool) {
+        
+        print("Display task - title: \(title), description: \(taskDescription), isEditMode: \(isEditMode)")
         
         titleLabel.text = title
-        descriptionTextView.text = description
+        descriptionTextView.text = taskDescription
         titleTextView.text = title
-        editableDescriptionTextView.text = description
+        editableDescriptionTextView.text = taskDescription
         
-        let formater = DateFormatter()
-        formater.dateFormat = "dd.MM.yyyy"
-        dateLabel.text = formater.string(from: Date())
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        dateLabel.text = formatter.string(from: Date())
         
         setupEditMode(isEditMode)
     }
     
     func setupEditMode(_ isEditMode: Bool) {
+
         titleLabel.isHidden = isEditMode
         descriptionTextView.isHidden = isEditMode
         dateLabel.isHidden = isEditMode
