@@ -49,6 +49,10 @@ class CoreDataService: StorageServiceProtocol {
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "TodoEntity")
         
+        let sortDescriptor = NSSortDescriptor(key: "id", ascending: true)
+        
+        request.sortDescriptors = [sortDescriptor]
+        
         do {
             let results = try context.fetch(request)
             var todos: [TodoItem] = []
