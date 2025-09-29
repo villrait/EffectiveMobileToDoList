@@ -8,16 +8,53 @@
 import UIKit
 
 protocol TaskDetailsViewControllerProtocol: AnyObject {
-    func displayTask(title: String, description: String, isCompleted: Bool)
+    func displayTask(title: String, description: String, isCompleted: Bool, isEditMode: Bool)
+    func setupEditMode(_ isEditMode: Bool)
 }
 
 class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProtocol {
     var presenter: TaskDetailsPresenterProtocol?
     
-    private let titleTextField = UITextField()
-    private let descriptionTextView = UITextView()
-    private let completedSwitch = UISwitch()
-    private let saveButton = UIButton(type: .system)
+    private let titleLabel: UILabel = {
+        $0.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        $0.numberOfLines = 0
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UILabel())
+    
+    private let dateLabel: UILabel = {
+        $0.font = UIFont.systemFont(ofSize: 14)
+        $0.textColor = .gray
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UILabel())
+    
+    private let descriptionTextView: UITextView = {
+        $0.font = UIFont.systemFont(ofSize: 16)
+        $0.isEditable = false
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UITextView())
+    
+    private let titleTextField: UITextField = {
+        $0.borderStyle = .roundedRect
+        $0.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        $0.isHidden = true
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UITextField())
+    
+    private let editableDescriptionTextView: UITextField = {
+        $0.font = UIFont.systemFont(ofSize: 16)
+        $0.layer.borderColor = UIColor.lightGray.cgColor
+        $0.layer.borderWidth = 1
+        $0.layer.cornerRadius = 5
+        $0.isHidden = true
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UITextField())
+    
+    private let saveButton = UIBarButtonItem()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,45 +65,77 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
     private func setupUI() {
         view.backgroundColor = .white
         
-        titleTextField.borderStyle = .roundedRect
-        titleTextField.placeholder = "Название задачи"
-        
-        descriptionTextView.layer.borderColor = UIColor.lightGray.cgColor
-        descriptionTextView.layer.borderWidth = 1
-        descriptionTextView.layer.cornerRadius = 3
-        
-        completedSwitch.isOn = false
-        
-        saveButton.setTitle("Сохранить", for: .normal)
-        saveButton.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
-        
-        let stackView = UIStackView(arrangedSubviews: [
-            titleTextField, descriptionTextView, completedSwitch, saveButton
-        ])
-        stackView.axis = .vertical
-        stackView.spacing = 10
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(stackView)
+        view.addSubview(titleLabel)
+        view.addSubview(dateLabel)
+        view.addSubview(descriptionTextView)
+        view.addSubview(titleTextField)
+        view.addSubview(editableDescriptionTextView)
         
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+            
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            dateLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            dateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            dateLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            descriptionTextView.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 20),
+            descriptionTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            descriptionTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            descriptionTextView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            
+            
+            titleTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            titleTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            editableDescriptionTextView.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 20),
+            editableDescriptionTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            editableDescriptionTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            editableDescriptionTextView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
+        
+        saveButton.title = "Сохранить"
+        saveButton.target = self
+        saveButton.action = #selector(saveTapped)
     }
     
-    func displayTask(title: String, description: String, isCompleted: Bool) {
-        titleTextField.text = title
+    func displayTask(title: String, description: String, isCompleted: Bool, isEditMode: Bool) {
+        
+        titleLabel.text = title
         descriptionTextView.text = description
-        completedSwitch.isOn = isCompleted
+        titleTextField.text = title
+        editableDescriptionTextView.text = description
+        
+        let formater = DateFormatter()
+        formater.dateFormat = "dd.MM.yyyy"
+        dateLabel.text = formater.string(from: Date())
+        
+        setupEditMode(isEditMode)
+    }
+    
+    func setupEditMode(_ isEditMode: Bool) {
+        titleLabel.isHidden = isEditMode
+        descriptionTextView.isHidden = isEditMode
+        titleTextField.isHidden = !isEditMode
+        editableDescriptionTextView.isHidden = !isEditMode
+        
+        if isEditMode {
+            navigationItem.rightBarButtonItem = saveButton
+            title = "Редактирование"
+        } else {
+            navigationItem.rightBarButtonItem = nil
+            title = "Детали задачи"
+        }
     }
     
     @objc private func saveTapped() {
         presenter?.saveTask(
             title: titleTextField.text ?? "",
-            description: descriptionTextView.text,
-            isCompleted: completedSwitch.isOn
+            description: editableDescriptionTextView.text,
+            isCompleted: false
         )
     }
 }
