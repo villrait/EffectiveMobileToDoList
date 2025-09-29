@@ -17,7 +17,7 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     
     var presenter: TaskListPresenterProtocol?
     private var tasks: [TodoItem] = []
-    private let cellIdentifier = "Cell"
+    private let cellIdentifier = "TaskCell"
     
     private let titleLabel: UILabel = {
         $0.text = "Задачи"
@@ -86,7 +86,8 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        
+        tableView.register(TaskCell.self, forCellReuseIdentifier: cellIdentifier)
         
         addButton.addTarget(self, action: #selector(addTaskTapped), for: .touchUpInside)
     }
@@ -150,12 +151,10 @@ extension TaskListViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! TaskCell
+        
         let task = tasks[indexPath.row]
-        
-        cell.textLabel?.text = task.title
-        cell.accessoryType = task.isCompleted ? .checkmark : .none
-        
+        cell.configure(with: task)
         return cell
     }
 }
