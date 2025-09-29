@@ -185,17 +185,7 @@ extension TaskListViewController: UITableViewDataSource {
     }
     
     private func updateTaskCompletion(at index: Int, isCompleted: Bool) {
-        guard index < tasks.count else { return }
-        var task = tasks[index]
-        
-        let updatedTask = TodoItem(
-            id: task.id,
-            title: task.title,
-            isCompleted: isCompleted,
-            userId: task.userId,
-            description: task.description
-        )
-        print("Task \(task.title) completion updated to: \(isCompleted)")
+        presenter?.updateTaskCompletion(at: index, isCompleted: isCompleted)
     }
 }
 

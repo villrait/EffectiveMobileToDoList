@@ -14,6 +14,7 @@ protocol TaskListPresenterProtocol: AnyObject {
     func tasksLoaded(_ tasks: [TodoItem])
     func refreshTasks()
     func tasksLoadingFailed(_ error: Error)
+    func updateTaskCompletion(at index: Int, isCompleted: Bool)
 }
 
 class TaskListPresenter: TaskListPresenterProtocol {
@@ -38,6 +39,12 @@ class TaskListPresenter: TaskListPresenterProtocol {
     func viewWillAppear() {
         print("Presenter: Экран появляется, обновляю локальные данные...")
         interactor?.loadTask()
+    }
+    
+    func updateTaskCompletion(at index: Int, isCompleted: Bool) {
+        guard index < tasks.count else { return }
+        let task = tasks[index]
+        interactor?.updateTaskCompletion(task, isCompleted: isCompleted)
     }
     
     func tasksLoadingFailed(_ error: any Error) {
