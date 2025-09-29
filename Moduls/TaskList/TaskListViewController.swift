@@ -14,20 +14,58 @@ protocol TaskListViewControllerProtocol: AnyObject {
 }
 
 class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
-    var presenter: TaskListPresenterProtocol?
     
-    private let tableView = UITableView()
-    private let cellIdentifier = "Cell"
+    var presenter: TaskListPresenterProtocol?
     private var tasks: [TodoItem] = []
-    private let activityIndicator = UIActivityIndicatorView(style: .large)
-    private let refreshControl = UIRefreshControl()
+    private let cellIdentifier = "Cell"
+    
+    private let titleLabel: UILabel = {
+        $0.text = "Задачи"
+        $0.font = UIFont.systemFont(ofSize: 34, weight: .bold)
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UILabel())
+    
+    private let searchTextField: UITextField = {
+        $0.placeholder = "Поиск"
+        $0.borderStyle = .roundedRect
+        $0.backgroundColor = .systemGray6
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UITextField())
+    
+    private let tableView: UITableView = {
+        $0.separatorStyle = .none
+        $0.rowHeight = 80
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UITableView())
+    
+    private let bottomPanel: UIView = {
+        $0.backgroundColor = .systemGray6
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UIView())
+    
+    private let tasksCountLabel: UILabel = {
+        $0.text = "0 задач"
+        $0.font = UIFont.systemFont(ofSize: 14)
+        $0.textColor = .gray
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UILabel())
+    
+    private let addButton:UIButton = {
+        $0.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
+        $0.tintColor = .systemBlue
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UIButton())
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTableView()
-        setupActivityIndicator()
-        tableView.dataSource = self
-        tableView.delegate = self
+        setupUI()
+        setupConstrains()
         presenter?.viewDidLoad()
     }
     
@@ -36,50 +74,73 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         presenter?.viewWillAppear()
     }
     
-    private func setupActivityIndicator() {
-        view.addSubview(activityIndicator)
-        activityIndicator.center = view.center
-        activityIndicator.hidesWhenStopped = true
-    }
-    
-    private func setupTableView() {
+    private func setupUI() {
+        view.backgroundColor = .white
+        
+        view.addSubview(titleLabel)
+        view.addSubview(searchTextField)
         view.addSubview(tableView)
-        tableView.frame = view.bounds
+        view.addSubview(bottomPanel)
+        bottomPanel.addSubview(tasksCountLabel)
+        bottomPanel.addSubview(addButton)
+        
+        tableView.dataSource = self
+        tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         
-        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
-        tableView.refreshControl = refreshControl
+        addButton.addTarget(self, action: #selector(addTaskTapped), for: .touchUpInside)
     }
     
-    func showError(_ message: String) {
-        DispatchQueue.main.async {
-            self.activityIndicator.stopAnimating()
-            self.refreshControl.endRefreshing()
+    private func setupConstrains() {
+        NSLayoutConstraint.activate([
             
-            let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-            alert.present(alert, animated: true)
-        }
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            searchTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
+            searchTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            tableView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 16),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: bottomPanel.topAnchor),
+            
+            bottomPanel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bottomPanel.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bottomPanel.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            bottomPanel.heightAnchor.constraint(equalToConstant: 60),
+            
+            tasksCountLabel.centerXAnchor.constraint(equalTo: bottomPanel.centerXAnchor),
+            tasksCountLabel.centerYAnchor.constraint(equalTo: bottomPanel.centerYAnchor),
+            
+            addButton.trailingAnchor.constraint(equalTo: bottomPanel.trailingAnchor, constant: -16),
+            addButton.centerYAnchor.constraint(equalTo: bottomPanel.centerYAnchor),
+            addButton.widthAnchor.constraint(equalToConstant: 30),
+            addButton.heightAnchor.constraint(equalToConstant: 30)
+        ])
+    }
+    
+    @objc private func addTaskTapped() {
+        //
+        print("Add task tapped")
     }
     
     func displayTasks(_ tasks: [TodoItem]) {
         self.tasks = tasks
-        DispatchQueue.main.async {
-            self.activityIndicator.stopAnimating()
-            self.refreshControl.endRefreshing()
-            self.tableView.reloadData()
-        }
+        tasksCountLabel.text = "\(tasks.count) задач"
+        tableView.reloadData()
     }
     
     func showLoading() {
-        activityIndicator.startAnimating()
+        //
     }
     
-    func hideRefreshIndicator() {
-        refreshControl.endRefreshing()
-    }
-    
-    @objc private func refreshData() {
-        presenter?.refreshTasks()
+    func showError(_ message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
 
@@ -91,8 +152,10 @@ extension TaskListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         let task = tasks[indexPath.row]
+        
         cell.textLabel?.text = task.title
         cell.accessoryType = task.isCompleted ? .checkmark : .none
+        
         return cell
     }
 }
