@@ -39,9 +39,9 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
     private let titleTextView: UITextView = {
         $0.font = UIFont.systemFont(ofSize: 20, weight: .bold)
         $0.isScrollEnabled = false
-        $0.layer.borderColor = UIColor.lightGray.cgColor
-        $0.layer.borderWidth = 1
-        $0.layer.cornerRadius = 5
+        $0.layer.borderColor = UIColor.systemGray4.cgColor
+        $0.layer.borderWidth = 2
+        $0.layer.cornerRadius = 8
         $0.isHidden = true
         $0.translatesAutoresizingMaskIntoConstraints = false
         return $0
@@ -49,9 +49,9 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
     
     private let editableDescriptionTextView: UITextView = {
         $0.font = UIFont.systemFont(ofSize: 16)
-        $0.layer.borderColor = UIColor.lightGray.cgColor
-        $0.layer.borderWidth = 1
-        $0.layer.cornerRadius = 5
+        $0.layer.borderColor = UIColor.systemGray4.cgColor
+        $0.layer.borderWidth = 2
+        $0.layer.cornerRadius = 8
         $0.isHidden = true
         $0.translatesAutoresizingMaskIntoConstraints = false
         return $0
@@ -66,7 +66,7 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
     }
     
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         view.addSubview(titleLabel)
         view.addSubview(dateLabel)
