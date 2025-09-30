@@ -18,6 +18,8 @@ protocol TaskListPresenterProtocol: AnyObject {
     func editTask(at index: Int)
     func deleteTask(at index: Int)
     func createNewTask()
+    func searchTasks(with query: String)
+    func getTotalTasksCount() -> Int
 }
 
 class TaskListPresenter: TaskListPresenterProtocol {
@@ -27,6 +29,8 @@ class TaskListPresenter: TaskListPresenterProtocol {
     var router: TaskListRouterProtocol?
     
     private var tasks: [TodoItem] = []
+    private var todos: [TodoItem] = []  // Убедись, что это есть
+    private var allTodos: [TodoItem] = []
     
     func viewDidLoad() {
         print("Presenter: View загрузилась, показываю локальные данные...")
@@ -57,6 +61,7 @@ class TaskListPresenter: TaskListPresenterProtocol {
     func tasksLoaded(_ tasks: [TodoItem]) {
         print("Presenter: Получено \(tasks.count) задач")
         self.tasks = tasks
+        self.allTodos = tasks
         DispatchQueue.main.async{
             self.view?.displayTasks(tasks)
         }
@@ -86,5 +91,27 @@ class TaskListPresenter: TaskListPresenterProtocol {
     func createNewTask() {
         print("Presenter: Создаем новую задачу")
         router?.showCreateTaskScreen()
+    }
+    
+    func searchTasks(with query: String) {
+        print("Presenter: Searching tasks with query: '\(query)'")
+        
+        if query.isEmpty {
+            self.todos = allTodos
+            view?.displayTasks(allTodos)
+        } else {
+            let filteredTasks = allTodos.filter { task in
+                let titleMatch = task.title.lowercased().contains(query.lowercased())
+                let descriptionMatch = task.description?.lowercased().contains(query.lowercased()) ?? false
+                return titleMatch || descriptionMatch
+            }
+            self.todos = filteredTasks
+            print("Presenter: Found \(filteredTasks.count) tasks matching '\(query)'")
+            view?.displayTasks(filteredTasks)
+        }
+    }
+    
+    func getTotalTasksCount() -> Int {
+        return allTodos.count
     }
 }

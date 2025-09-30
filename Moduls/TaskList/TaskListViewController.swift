@@ -80,7 +80,7 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     }
     
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         view.addSubview(titleLabel)
         view.addSubview(searchTextField)
@@ -93,12 +93,13 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         
         tableView.dataSource = self
         tableView.delegate = self
-        
         tableView.refreshControl = refreshControl
-        
         tableView.register(TaskCell.self, forCellReuseIdentifier: cellIdentifier)
         
         addButton.addTarget(self, action: #selector(addTaskTapped), for: .touchUpInside)
+        
+        searchTextField.addTarget(self, action: #selector(searchTextChanged), for: .editingChanged)
+        searchTextField.delegate = self
     }
     
     private func setupConstrains() {
@@ -135,11 +136,20 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     func displayTasks(_ tasks: [TodoItem]) {
         self.tasks = tasks
         DispatchQueue.main.async {
-            self.tasksCountLabel.text = "\(tasks.count) задач"
+            let searchText = self.searchTextField.text ?? ""
+            if searchText.isEmpty {
+                self.tasksCountLabel.text = "\(tasks.count) задач"
+            } else {
+                self.tasksCountLabel.text = "Найдено: \(tasks.count) из \(self.getTotalTasksCount())"
+            }
             self.tableView.reloadData()
             self.refreshControl.endRefreshing()
             self.refreshControl.attributedTitle = NSAttributedString(string: "Последнее обновление: \(Date().formatted())")
         }
+    }
+
+    private func getTotalTasksCount() -> Int {
+        return tasks.count
     }
     
     func showLoading() {
@@ -160,6 +170,18 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     @objc private func refreshData() {
         print("Refresh triggered")
         presenter?.refreshTasks()
+    }
+    
+    @objc private func searchTextChanged() {
+        let searchText = searchTextField.text ?? ""
+        presenter?.searchTasks(with: searchText)
+    }
+}
+
+extension TaskListViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
 
