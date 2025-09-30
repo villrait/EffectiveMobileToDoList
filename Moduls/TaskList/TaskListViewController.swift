@@ -153,7 +153,7 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     }
     
     @objc private func addTaskTapped() {
-        //
+        presenter?.createNewTask()
         print("Add task tapped")
     }
     
@@ -206,8 +206,8 @@ extension TaskListViewController: UITableViewDelegate {
                 self.shareTask(at: indexPath.row)
             }
             
-            let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash")) { _ in
-                self.deleteTask(at: indexPath.row)
+            let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+                self.showDeleteConfirmation(for: indexPath.row)
             }
             
             return UIMenu(title: "", children: [editAction, shareAction, deleteAction])
@@ -230,6 +230,28 @@ extension TaskListViewController: UITableViewDelegate {
         present(activityVC, animated: true)
     }
     
+    private func showDeleteConfirmation(for index: Int) {
+        guard index < tasks.count else { return }
+        
+        let task = tasks[index]
+        
+        let alert = UIAlertController(
+            title: "Удалить задачу?",
+            message: "Задача \"\(task.title)\" будет удалена. Это действие нельзя отменить.",
+            preferredStyle: .alert)
+        
+        let deleteAction = UIAlertAction(title: "Удалить", style: .destructive) { _ in
+            self.deleteTask(at: index)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel)
+        
+        alert.addAction(deleteAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
+    }
+    
     private func formatDate(_ date: Date) -> String {
         let formater = DateFormatter()
         formater.dateFormat = "dd.MM.yyyy"
@@ -237,6 +259,6 @@ extension TaskListViewController: UITableViewDelegate {
     }
     
     private func deleteTask(at index: Int) {
-        print("Delete task at index: \(index)")
+        presenter?.deleteTask(at: index)
     }
 }

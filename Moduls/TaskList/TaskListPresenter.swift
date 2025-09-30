@@ -17,6 +17,7 @@ protocol TaskListPresenterProtocol: AnyObject {
     func updateTaskCompletion(at index: Int, isCompleted: Bool)
     func editTask(at index: Int)
     func deleteTask(at index: Int)
+    func createNewTask()
 }
 
 class TaskListPresenter: TaskListPresenterProtocol {
@@ -80,5 +81,10 @@ class TaskListPresenter: TaskListPresenterProtocol {
         let task = tasks[index]
         print("Presenter: Удаляем задачу - \(task.title)")
         interactor?.deleteTask(task)
+    }
+    
+    func createNewTask() {
+        print("Presenter: Создаем новую задачу")
+        router?.showCreateTaskScreen()
     }
 }

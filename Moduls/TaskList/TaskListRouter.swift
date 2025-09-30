@@ -10,6 +10,7 @@ import UIKit
 protocol TaskListRouterProtocol: AnyObject {
     func showTaskDetails(_ task: TodoItem)
     func showTaskDetailsForEditing(_ task: TodoItem)
+    func showCreateTaskScreen()
 }
 
 class TaskListRouter: TaskListRouterProtocol {
@@ -34,5 +35,28 @@ class TaskListRouter: TaskListRouterProtocol {
         }
         
         sourceVC.navigationController?.pushViewController(detailsVC, animated: true)
+    }
+    
+    func showCreateTaskScreen() {
+        guard let sourceVC = viewController as? UIViewController else { return }
+        
+        let newTask = TodoItem(
+            id: Int.random(in: 1000...9999),
+            title: "",
+            isCompleted: false,
+            userId: 1,
+            description: nil
+        )
+        
+        let diContainer = DIContainer()
+        let detailVC = diContainer.makeTaskDetailsModule(task: newTask)
+        
+        if let detailsVC = detailVC as? TaskDetailsViewController,
+           let presenter = detailVC.presenter as? TaskDetailsPresenter {
+            presenter.isEditMode = true
+            presenter.task = newTask
+        }
+        
+        sourceVC.navigationController?.pushViewController(detailVC, animated: true)
     }
 }
