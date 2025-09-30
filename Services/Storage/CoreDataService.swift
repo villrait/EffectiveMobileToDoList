@@ -39,6 +39,9 @@ class CoreDataService: StorageServiceProtocol {
     }
     
     func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool) {
+        
+        print("✅ Обновление статуса '\(task.title)' на \(isCompleted), поток: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+        
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "TodoEntity")
         request.predicate = NSPredicate(format: "id == %d", task.id)
         

@@ -20,11 +20,19 @@ class TaskListInteractor: TaskListInteractorProtocol {
     var storageService: StorageServiceProtocol?
     
     func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool) {
-        storageService?.updateTaskCompletion(task, isCompleted: isCompleted)
-        print("Interactor: Task completion updated - \(task.title): \(isCompleted)")
+        print("✅ Изменение статуса задачи: \(task.title) -> \(isCompleted)")
         
-        let currentTasks = storageService?.loadTodos() ?? []
-        presenter?.tasksLoaded(currentTasks)
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            print("✅ Изменение статуса в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+            self?.storageService?.updateTaskCompletion(task, isCompleted: isCompleted)
+            
+            let currentTasks = self?.storageService?.loadTodos() ?? []
+            
+            DispatchQueue.main.async {
+                print("✅ Статус обновлен, UI в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+                self?.presenter?.tasksLoaded(currentTasks)
+            }
+        }
     }
     
     func loadTask() {
