@@ -61,9 +61,10 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     }(UILabel())
     
     private let addButton:UIButton = {
-        $0.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
+        $0.setImage(UIImage(systemName: "square.and.pencil"), for: .normal)
         $0.tintColor = .systemBlue
         $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
         return $0
     }(UIButton())
     
@@ -121,15 +122,13 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
             bottomPanel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             bottomPanel.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             bottomPanel.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            bottomPanel.heightAnchor.constraint(equalToConstant: 60),
+            bottomPanel.heightAnchor.constraint(equalToConstant: 80),
             
             tasksCountLabel.centerXAnchor.constraint(equalTo: bottomPanel.centerXAnchor),
-            tasksCountLabel.centerYAnchor.constraint(equalTo: bottomPanel.centerYAnchor),
+            tasksCountLabel.topAnchor.constraint(equalTo: bottomPanel.topAnchor, constant: 20),
             
-            addButton.trailingAnchor.constraint(equalTo: bottomPanel.trailingAnchor, constant: -16),
-            addButton.centerYAnchor.constraint(equalTo: bottomPanel.centerYAnchor),
-            addButton.widthAnchor.constraint(equalToConstant: 30),
-            addButton.heightAnchor.constraint(equalToConstant: 30)
+            addButton.trailingAnchor.constraint(equalTo: bottomPanel.trailingAnchor, constant: -50),
+            addButton.centerYAnchor.constraint(equalTo: tasksCountLabel.centerYAnchor)
         ])
     }
     
