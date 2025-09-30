@@ -13,6 +13,7 @@ struct TodoItem: Codable {
     let isCompleted: Bool
     let userId: Int
     let createdAt: Date
+    var updatedAt: Date
     var description: String?
     
     init(id: Int,
@@ -25,6 +26,7 @@ struct TodoItem: Codable {
         self.isCompleted = isCompleted
         self.userId = userId
         self.createdAt = Date()
+        self.updatedAt = Date()
         self.description = description
     }
     
@@ -35,6 +37,7 @@ struct TodoItem: Codable {
         isCompleted = try container.decode(Bool.self, forKey: .isCompleted)
         userId = try container.decode(Int.self, forKey: .userId)
         createdAt = Date()
+        updatedAt = Date()
         description = try container.decode(String.self, forKey: .title)
     }
     

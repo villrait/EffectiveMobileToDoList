@@ -13,4 +13,5 @@ protocol StorageServiceProtocol {
     func saveNewTaskOnly(_ task: TodoItem)
     func updateTaskOnly(_ task: TodoItem)
     func deleteTask(_ task: TodoItem)
+    func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool)
 }

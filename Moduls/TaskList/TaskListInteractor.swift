@@ -19,6 +19,16 @@ class TaskListInteractor: TaskListInteractorProtocol {
     var networkService: NetworkServiceProtocol?
     var storageService: StorageServiceProtocol?
     
+    func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool) {
+        // Используем новый метод
+        storageService?.updateTaskCompletion(task, isCompleted: isCompleted)
+        print("Interactor: Task completion updated - \(task.title): \(isCompleted)")
+        
+        // Обновляем список
+        let currentTasks = storageService?.loadTodos() ?? []
+        presenter?.tasksLoaded(currentTasks)
+    }
+    
     func loadTask() {
         print("Interactor: Загружаю задачи из БД...")
         
@@ -51,22 +61,6 @@ class TaskListInteractor: TaskListInteractorProtocol {
                 
             }
         }
-    }
-    
-    func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool) {
-        let updatedTask = TodoItem(
-            id: task.id,
-            title: task.title,
-            isCompleted: isCompleted,
-            userId: task.userId,
-            description: task.description
-        )
-        
-        storageService?.updateTaskOnly(updatedTask)
-        print("Interactor: Task completion updated - \(task.title): \(isCompleted)")
-        
-        let currentTasks = storageService?.loadTodos() ?? []
-        presenter?.tasksLoaded(currentTasks)
     }
     
     func deleteTask(_ task: TodoItem) {

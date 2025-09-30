@@ -38,6 +38,26 @@ class CoreDataService: StorageServiceProtocol {
         saveContext()
     }
     
+    func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool) {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "TodoEntity")
+        request.predicate = NSPredicate(format: "id == %d", task.id)
+        
+        do {
+            let results = try context.fetch(request)
+            if let entity = results.first as? NSManagedObject {
+                entity.setValue(isCompleted, forKey: "isCompleted")
+                
+                let formatter = DateFormatter()
+                formatter.dateFormat = "HH:mm:ss"
+                let updatedAt = entity.value(forKey: "updatedAt") as? Date ?? Date()
+                print("UPDATING Completion: '\(task.title)' - \(isCompleted), keeping update date: \(formatter.string(from: updatedAt))")
+            }
+            saveContext()
+        } catch {
+            print("CoreData: Error updating task completion - \(error)")
+        }
+    }
+    
     func updateTaskOnly(_ task: TodoItem) {
         print("Updating ONLY ONE task: \(task.title)")
         
@@ -47,15 +67,14 @@ class CoreDataService: StorageServiceProtocol {
         do {
             let results = try context.fetch(request)
             if let entity = results.first as? NSManagedObject {
-                // Обновляем только поля, НЕ трогаем дату создания!
                 entity.setValue(task.title, forKey: "title")
                 entity.setValue(task.isCompleted, forKey: "isCompleted")
                 entity.setValue(task.description, forKey: "taskDescription")
+                entity.setValue(Date(), forKey: "updatedAt")
                 
                 let formatter = DateFormatter()
                 formatter.dateFormat = "HH:mm:ss"
-                let createdAt = entity.value(forKey: "createdAt") as? Date ?? Date()
-                print("UPDATING Task: '\(task.title)' - Keeping original date: \(formatter.string(from: createdAt))")
+                print("UPDATING Task: '\(task.title)' - Updated at: \(formatter.string(from: Date()))")
             }
             saveContext()
         } catch {
@@ -92,8 +111,9 @@ class CoreDataService: StorageServiceProtocol {
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "TodoEntity")
         
-        let sortByDate = NSSortDescriptor(key: "createdAt", ascending: false)
-        request.sortDescriptors = [sortByDate]
+        // Сортируем по updatedAt (времени обновления) - новые сверху
+        let sortByUpdateDate = NSSortDescriptor(key: "updatedAt", ascending: false)
+        request.sortDescriptors = [sortByUpdateDate]
         
         do {
             let results = try context.fetch(request)
@@ -105,11 +125,8 @@ class CoreDataService: StorageServiceProtocol {
                 let isCompleted = entity.value(forKey: "isCompleted") as? Bool ?? false
                 let userId = entity.value(forKey: "userId") as? Int64 ?? 0
                 let createdAt = entity.value(forKey: "createdAt") as? Date ?? Date()
+                let updatedAt = entity.value(forKey: "updatedAt") as? Date ?? Date()  // Добавляем чтение updatedAt
                 let description = entity.value(forKey: "taskDescription") as? String
-                
-                let formatter = DateFormatter()
-                formatter.dateFormat = "HH:mm:ss"
-                print("Task: '\(title)' - ID: \(id) - Created: \(formatter.string(from: createdAt))")
                 
                 let todo = TodoItem(
                     id: Int(id),
@@ -120,11 +137,6 @@ class CoreDataService: StorageServiceProtocol {
                 )
                 
                 todos.append(todo)
-            }
-            
-            print("=== FINAL ORDER ===")
-            for (index, todo) in todos.enumerated() {
-                print("\(index): \(todo.title)")
             }
             
             return todos
@@ -166,25 +178,20 @@ class CoreDataService: StorageServiceProtocol {
         entity.setValue(task.isCompleted, forKey: "isCompleted")
         entity.setValue(Int64(task.userId), forKey: "userId")
         entity.setValue(date, forKey: "createdAt")
+        entity.setValue(date, forKey: "updatedAt")
         entity.setValue(task.description, forKey: "taskDescription")
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm:ss"
-        print("SAVING API Task: '\(task.title)' - Created: \(formatter.string(from: date))")
     }
-    
+
     private func saveNewTask(_ task: TodoItem) {
         let entity = NSEntityDescription.insertNewObject(forEntityName: "TodoEntity", into: context)
         entity.setValue(Int64(task.id), forKey: "id")
         entity.setValue(task.title, forKey: "title")
         entity.setValue(task.isCompleted, forKey: "isCompleted")
         entity.setValue(Int64(task.userId), forKey: "userId")
-        entity.setValue(Date(), forKey: "createdAt")
+        let currentDate = Date()
+        entity.setValue(currentDate, forKey: "createdAt")
+        entity.setValue(currentDate, forKey: "updatedAt")
         entity.setValue(task.description, forKey: "taskDescription")
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm:ss"
-        print("SAVING NEW Task: '\(task.title)' - Created: \(formatter.string(from: Date()))")
     }
     
     private func saveContext() {
