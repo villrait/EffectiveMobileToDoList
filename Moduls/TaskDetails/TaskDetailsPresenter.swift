@@ -14,17 +14,19 @@ protocol TaskDetailsPresenterProtocol: AnyObject {
 }
 
 class TaskDetailsPresenter: TaskDetailsPresenterProtocol {
+    
+    // MARK: - Properties
+    
     weak var view: TaskDetailsViewControllerProtocol?
     var interactor: TaskDetailsInteractorProtocol?
     var router: TaskDetailsRouterProtocol?
     var isEditMode: Bool = false
-    
     var task: TodoItem?
     
+    // MARK: - TaskDetailsPresenterProtocol
+    
     func viewDidLoad() {
-        print("Presenter: Экран деталей загружен, режим: \(isEditMode ? "редактирование" : "просмотр")")
         guard let task = task else { return }
-        print("Presenter: Task description - \(task.description ?? "nil")")
         view?.displayTask(
             title: task.title,
             taskDescription: task.description ?? "",
@@ -34,17 +36,16 @@ class TaskDetailsPresenter: TaskDetailsPresenterProtocol {
     }
     
     func saveTask(title: String, description: String?, isCompleted: Bool) {
-        print("Presenter: Сохраняю задачу - \(title)")
         guard let task = task else { return }
         interactor?.saveTask(
-            task, newTitle: title,
+            task,
+            newTitle: title,
             newDescription: description,
             newIsCompleted: isCompleted
         )
     }
     
     func taskSavedSuccessfully() {
-        print("Presenter: Задача успешно сохранена")
         router?.closeScreen()
     }
 }

@@ -12,11 +12,15 @@ protocol TaskDetailsInteractorProtocol: AnyObject {
 }
 
 class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
+    
+    // MARK: - Properties
+    
     weak var presenter: TaskDetailsPresenterProtocol?
     var storageService: StorageServiceProtocol?
     
+    // MARK: - TaskDetailsInteractorProtocol
+    
     func saveTask(_ task: TodoItem, newTitle: String, newDescription: String?, newIsCompleted: Bool) {
-        
         if task.title.isEmpty {
             let newTask = TodoItem(
                 id: Int.random(in: 1000...9999),
@@ -27,11 +31,9 @@ class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
             )
             
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                print("💾 Сохранение новой задачи в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
                 self?.storageService?.saveNewTaskOnly(newTask)
                 
                 DispatchQueue.main.async {
-                    print("💾 Задача сохранена, возвращаемся в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
                     self?.presenter?.taskSavedSuccessfully()
                 }
             }
@@ -46,7 +48,6 @@ class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
             )
             
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                print("✏️ Сохранение редактирования в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
                 self?.storageService?.updateTaskOnly(updatedTask)
                 
                 DispatchQueue.main.async {

@@ -13,7 +13,12 @@ protocol TaskDetailsViewControllerProtocol: AnyObject {
 }
 
 class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProtocol {
+    
+    // MARK: - Properties
+    
     var presenter: TaskDetailsPresenterProtocol?
+    
+    // MARK: - UI Elements
     
     private let titleLabel: UILabel = {
         $0.font = UIFont.systemFont(ofSize: 20, weight: .bold)
@@ -59,6 +64,8 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
     
     private let saveButton = UIBarButtonItem()
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -67,6 +74,8 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
         titleTextView.delegate = self
         editableDescriptionTextView.delegate = self
     }
+    
+    // MARK: - Private Methods
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
@@ -108,10 +117,14 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
         saveButton.isEnabled = false
     }
     
+    private func updateSaveButtonState() {
+        let title = titleTextView.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        saveButton.isEnabled = !title.isEmpty
+    }
+    
+    // MARK: - TaskDetailsViewControllerProtocol
+    
     func displayTask(title: String, taskDescription: String, isCompleted: Bool, isEditMode: Bool) {
-        
-        print("Display task - title: \(title), description: \(taskDescription), isEditMode: \(isEditMode)")
-        
         titleLabel.text = title
         descriptionTextView.text = taskDescription
         titleTextView.text = title
@@ -125,7 +138,6 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
     }
     
     func setupEditMode(_ isEditMode: Bool) {
-
         titleLabel.isHidden = isEditMode
         descriptionTextView.isHidden = isEditMode
         dateLabel.isHidden = isEditMode
@@ -141,8 +153,9 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
         }
     }
     
+    // MARK: - Actions
+    
     @objc private func saveTapped() {
-        
         let title = titleTextView.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         
         guard !title.isEmpty else { return }
@@ -155,13 +168,10 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
     }
 }
 
+// MARK: - UITextViewDelegate
+
 extension TaskDetailsViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         updateSaveButtonState()
-    }
-    
-    private func updateSaveButtonState() {
-        let title = titleTextView.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        saveButton.isEnabled = !title.isEmpty
     }
 }
