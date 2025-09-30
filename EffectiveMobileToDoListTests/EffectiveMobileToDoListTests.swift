@@ -10,27 +10,60 @@ import XCTest
 
 final class EffectiveMobileToDoListTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    // MARK: - TodoItem Tests
+    
+    func testTodoItemCreation() {
+        // Given
+        let task = TodoItem(
+            id: 1,
+            title: "Купить молоко",
+            isCompleted: false,
+            userId: 123,
+            description: "Не забыть купить молоко"
+        )
+        
+        // Then
+        XCTAssertEqual(task.id, 1)
+        XCTAssertEqual(task.title, "Купить молоко")
+        XCTAssertFalse(task.isCompleted)
+        XCTAssertEqual(task.userId, 123)
+        XCTAssertEqual(task.description, "Не забыть купить молоко")
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    
+    func testTodoItemDefaultValues() {
+        // Given
+        let task = TodoItem(id: 2, title: "Простая задача")
+        
+        // Then
+        XCTAssertEqual(task.id, 2)
+        XCTAssertEqual(task.title, "Простая задача")
+        XCTAssertFalse(task.isCompleted)
+        XCTAssertEqual(task.userId, 1)
+        XCTAssertNil(task.description)
+    }
+    
+    func testTodoItemCompletionToggle() {
+        // Given
+        var task = TodoItem(id: 3, title: "Задача")
+        
+        // When
+        let completedTask = TodoItem(
+            id: task.id,
+            title: task.title,
+            isCompleted: true,
+            userId: task.userId,
+            description: task.description
+        )
+        
+        // Then
+        XCTAssertTrue(completedTask.isCompleted)
     }
 
     func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+        
     }
 
     func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+        
     }
-
 }
