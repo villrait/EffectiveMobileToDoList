@@ -113,7 +113,12 @@ class TaskCell: UITableViewCell {
         let cleanAttributedString = NSAttributedString(string: cleanText)
         titleLabel.attributedText = cleanAttributedString
         
-        descriptionLabel.text = task.description ?? "Нет описания"
+        if let description = task.description, !description.isEmpty {
+            descriptionLabel.text = description
+        } else {
+            descriptionLabel.text = "Нет описания"
+        }
+        descriptionLabel.isHidden = false
         
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
