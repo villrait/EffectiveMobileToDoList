@@ -17,21 +17,33 @@ class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
     
     func saveTask(_ task: TodoItem, newTitle: String, newDescription: String?, newIsCompleted: Bool) {
         
-        let currentTasks = storageService?.loadTodos() ?? []
+        var currentTasks = storageService?.loadTodos() ?? []
         
-        var updatedTasks = currentTasks
-        if let index = updatedTasks.firstIndex(where: { $0.id == task.id }) {
-            let updatedTask = TodoItem(
-                id: task.id,
+        if task.title.isEmpty {
+            let newTask = TodoItem(
+                id: Int.random(in: 1000...9999),
                 title: newTitle,
                 isCompleted: newIsCompleted,
                 userId: task.userId,
                 description: newDescription
             )
-            updatedTasks[index] = updatedTask
+            currentTasks.insert(newTask, at: 0)
+            print("Interactor: Новая задача создана - \(newTitle)")
+        } else {
+            if let index = currentTasks.firstIndex(where: { $0.id == task.id }) {
+                let updatedTask = TodoItem(
+                    id: task.id,
+                    title: newTitle,
+                    isCompleted: newIsCompleted,
+                    userId: task.userId,
+                    description: newDescription
+                )
+                currentTasks[index] = updatedTask
+                print("Interactor: Задача обновлена - \(newTitle)")
+            }
         }
         
-        storageService?.saveTodos(updatedTasks)
+        storageService?.saveTodos(currentTasks)
         print("Interactor: Задача обновлена - \(newTitle), описание: \(newDescription ?? "nil")")
         presenter?.taskSavedSuccessfully()
     }
