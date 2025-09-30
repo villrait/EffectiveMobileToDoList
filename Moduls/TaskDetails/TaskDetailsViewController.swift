@@ -63,6 +63,9 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
         super.viewDidLoad()
         setupUI()
         presenter?.viewDidLoad()
+        
+        titleTextView.delegate = self
+        editableDescriptionTextView.delegate = self
     }
     
     private func setupUI() {
@@ -102,6 +105,7 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
         saveButton.title = "Сохранить"
         saveButton.target = self
         saveButton.action = #selector(saveTapped)
+        saveButton.isEnabled = false
     }
     
     func displayTask(title: String, taskDescription: String, isCompleted: Bool, isEditMode: Bool) {
@@ -138,10 +142,26 @@ class TaskDetailsViewController: UIViewController, TaskDetailsViewControllerProt
     }
     
     @objc private func saveTapped() {
+        
+        let title = titleTextView.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        
+        guard !title.isEmpty else { return }
+        
         presenter?.saveTask(
             title: titleTextView.text ?? "",
-            description: editableDescriptionTextView.text,
+            description: editableDescriptionTextView.text?.trimmingCharacters(in: .whitespacesAndNewlines),
             isCompleted: false
         )
+    }
+}
+
+extension TaskDetailsViewController: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        updateSaveButtonState()
+    }
+    
+    private func updateSaveButtonState() {
+        let title = titleTextView.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        saveButton.isEnabled = !title.isEmpty
     }
 }
