@@ -20,6 +20,7 @@ protocol TaskListPresenterProtocol: AnyObject {
     func createNewTask()
     func searchTasks(with query: String)
     func getTotalTasksCount() -> Int
+    func showLoading()
 }
 
 class TaskListPresenter: TaskListPresenterProtocol {
@@ -29,7 +30,7 @@ class TaskListPresenter: TaskListPresenterProtocol {
     var router: TaskListRouterProtocol?
     
     private var tasks: [TodoItem] = []
-    private var todos: [TodoItem] = []  // Убедись, что это есть
+    private var todos: [TodoItem] = []
     private var allTodos: [TodoItem] = []
     
     func viewDidLoad() {
@@ -65,6 +66,10 @@ class TaskListPresenter: TaskListPresenterProtocol {
         DispatchQueue.main.async{
             self.view?.displayTasks(tasks)
         }
+    }
+    
+    func showLoading() {
+        view?.showLoading()
     }
     
     func editTask(at index: Int) {

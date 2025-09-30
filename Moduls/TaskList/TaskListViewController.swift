@@ -152,7 +152,7 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     }
     
     func showLoading() {
-        //
+        refreshControl.beginRefreshing()
     }
     
     func showError(_ message: String) {
