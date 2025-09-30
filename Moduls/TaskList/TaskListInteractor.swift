@@ -15,71 +15,58 @@ protocol TaskListInteractorProtocol: AnyObject {
 }
 
 class TaskListInteractor: TaskListInteractorProtocol {
+    
+    // MARK: - Properties
+    
     weak var presenter: TaskListPresenter?
     var networkService: NetworkServiceProtocol?
     var storageService: StorageServiceProtocol?
     
+    // MARK: - TaskListInteractorProtocol
+    
     func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool) {
-        print("✅ Изменение статуса задачи: \(task.title) -> \(isCompleted)")
-        
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            print("✅ Изменение статуса в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
             self?.storageService?.updateTaskCompletion(task, isCompleted: isCompleted)
             
             let currentTasks = self?.storageService?.loadTodos() ?? []
             
             DispatchQueue.main.async {
-                print("✅ Статус обновлен, UI в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
                 self?.presenter?.tasksLoaded(currentTasks)
             }
         }
     }
     
     func loadTask() {
-        print("Interactor: Загружаю задачи из БД...")
-        
         let localTasks = storageService?.loadTodos() ?? []
         
         if localTasks.isEmpty {
-            print("Interactor: БД пустая, загружаю из сети...")
             refreshFromNetwork()
         } else {
-            print("Interactor: Найдено \(localTasks.count) задач в БД")
             presenter?.tasksLoaded(localTasks)
         }
     }
     
     func refreshFromNetwork() {
-        print("Interactor: Полная перезагрузка из сети...")
-        print("📱 Текущий поток: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
-        
         DispatchQueue.main.async {
-            print("🔄 Показываем спиннер в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
             self.presenter?.showLoading()
         }
         
         DispatchQueue.global(qos: .userInitiated).async {
-            print("🌐 Сетевой запрос в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
-            
             self.networkService?.fetchTodos { [weak self] result in
-                print("📥 Получили ответ в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
-                
                 switch result {
                 case .success(let tasks):
-                    print("Interactor: Получено \(tasks.count) задач из API")
                     self?.storageService?.saveTodos(tasks)
-                    let updateTasks = self?.storageService?.loadTodos() ?? []
+                    let updatedTasks = self?.storageService?.loadTodos() ?? []
                     
                     DispatchQueue.main.async {
-                        print("🎨 Обновляем UI в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
-                        self?.presenter?.tasksLoaded(updateTasks)
+                        self?.presenter?.tasksLoaded(updatedTasks)
                     }
                     
                 case .failure(let error):
-                    print("Interactor: Ошибка загрузки: \(error)")
                     DispatchQueue.main.async {
                         let localTasks = self?.storageService?.loadTodos() ?? []
                         self?.presenter?.tasksLoaded(localTasks)
+                        self?.presenter?.tasksLoadingFailed(error)
                     }
                 }
             }
@@ -87,17 +74,12 @@ class TaskListInteractor: TaskListInteractorProtocol {
     }
     
     func deleteTask(_ task: TodoItem) {
-        print("🗑️ Начинаем удаление задачи: \(task.title)")
-        
-        
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            print("🗑️ Удаление задачи в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
             self?.storageService?.deleteTask(task)
             
             let updatedTasks = self?.storageService?.loadTodos() ?? []
             
-            DispatchQueue.main.async{
-                print("🗑️ Удаление завершено, обновляем UI в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+            DispatchQueue.main.async {
                 self?.presenter?.tasksLoaded(updatedTasks)
             }
         }

@@ -9,6 +9,8 @@ import UIKit
 
 class TaskCell: UITableViewCell {
     
+    // MARK: - UI Elements
+    
     private let checkButton: UIButton = {
         $0.setImage(UIImage(systemName: "circle"), for: .normal)
         $0.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .selected)
@@ -40,7 +42,11 @@ class TaskCell: UITableViewCell {
         return $0
     }(UIView())
     
+    // MARK: - Properties
+    
     var onCheckboxTapped: ((Bool) -> Void)?
+    
+    // MARK: - Initialization
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -52,6 +58,8 @@ class TaskCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Private Methods
+    
     private func setupUI() {
         [checkButton, titleLabel, descriptionLabel, dateLabel, separator].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -61,7 +69,6 @@ class TaskCell: UITableViewCell {
     }
     
     private func setupConstraints() {
-        // Сначала создаем констрейнты
         let descriptionHeightConstraint = descriptionLabel.heightAnchor.constraint(lessThanOrEqualToConstant: 40)
         descriptionHeightConstraint.priority = .required
         
@@ -97,7 +104,6 @@ class TaskCell: UITableViewCell {
     
     private func updateTitleStrikeThrough() {
         let text = titleLabel.text ?? ""
-        
         let attributeString = NSMutableAttributedString(string: text)
         
         if checkButton.isSelected {
@@ -107,6 +113,16 @@ class TaskCell: UITableViewCell {
         }
         titleLabel.attributedText = attributeString
     }
+    
+    // MARK: - Actions
+    
+    @objc private func checkButtonTapped() {
+        checkButton.isSelected.toggle()
+        updateTitleStrikeThrough()
+        onCheckboxTapped?(checkButton.isSelected)
+    }
+    
+    // MARK: - Public Methods
     
     func configure(with task: TodoItem) {
         let cleanText = task.title
@@ -126,11 +142,5 @@ class TaskCell: UITableViewCell {
         
         checkButton.isSelected = task.isCompleted
         updateTitleStrikeThrough()
-    }
-    
-    @objc private func checkButtonTapped() {
-        checkButton.isSelected.toggle()
-        updateTitleStrikeThrough()
-        onCheckboxTapped?(checkButton.isSelected)
     }
 }

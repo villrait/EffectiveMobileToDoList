@@ -14,31 +14,23 @@ protocol TaskListRouterProtocol: AnyObject {
 }
 
 class TaskListRouter: TaskListRouterProtocol {
+    
+    // MARK: - Properties
+    
     weak var viewController: TaskListViewController?
     
-    func showTaskDetails(_ task: TodoItem){
+    // MARK: - TaskListRouterProtocol
+    
+    func showTaskDetails(_ task: TodoItem) {
         showTaskDetails(task, isEditMode: false)
     }
     
-    func showTaskDetailsForEditing(_ task: TodoItem){
+    func showTaskDetailsForEditing(_ task: TodoItem) {
         showTaskDetails(task, isEditMode: true)
     }
     
-    func showTaskDetails(_ task: TodoItem, isEditMode: Bool) {
-        guard let sourceVC = viewController as? UIViewController else { return }
-    
-        let diContainer = DIContainer()
-        let detailsVC = diContainer.makeTaskDetailsModule(task: task)
-        
-        if let detailVC = detailsVC as? TaskDetailsViewController, let presenter = detailVC.presenter as? TaskDetailsPresenter {
-            presenter.isEditMode = isEditMode
-        }
-        
-        sourceVC.navigationController?.pushViewController(detailsVC, animated: true)
-    }
-    
     func showCreateTaskScreen() {
-        guard let sourceVC = viewController as? UIViewController else { return }
+        guard let sourceVC = viewController else { return }
         
         let newTask = TodoItem(
             id: Int.random(in: 1000...9999),
@@ -51,12 +43,26 @@ class TaskListRouter: TaskListRouterProtocol {
         let diContainer = DIContainer()
         let detailVC = diContainer.makeTaskDetailsModule(task: newTask)
         
-        if let detailsVC = detailVC as? TaskDetailsViewController,
-           let presenter = detailVC.presenter as? TaskDetailsPresenter {
+        if let presenter = detailVC.presenter as? TaskDetailsPresenter {
             presenter.isEditMode = true
             presenter.task = newTask
         }
         
         sourceVC.navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
+    // MARK: - Private Methods
+    
+    private func showTaskDetails(_ task: TodoItem, isEditMode: Bool) {
+        guard let sourceVC = viewController else { return }
+        
+        let diContainer = DIContainer()
+        let detailsVC = diContainer.makeTaskDetailsModule(task: task)
+        
+        if let presenter = detailsVC.presenter as? TaskDetailsPresenter {
+            presenter.isEditMode = isEditMode
+        }
+        
+        sourceVC.navigationController?.pushViewController(detailsVC, animated: true)
     }
 }

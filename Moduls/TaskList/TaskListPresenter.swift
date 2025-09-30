@@ -25,29 +25,30 @@ protocol TaskListPresenterProtocol: AnyObject {
 
 class TaskListPresenter: TaskListPresenterProtocol {
     
+    // MARK: - Properties
+    
     weak var view: TaskListViewController?
     var interactor: TaskListInteractorProtocol?
     var router: TaskListRouterProtocol?
     
     private var tasks: [TodoItem] = []
-    private var todos: [TodoItem] = []
     private var allTodos: [TodoItem] = []
     
-    func viewDidLoad() {
-        print("Presenter: View загрузилась, показываю локальные данные...")
-        interactor?.loadTask()
-    }
+    // MARK: - Lifecycle Methods
     
-    func refreshTasks() {
-        print("Presenter: Принудительное обновление из сети...")
-        view?.showLoading()
-        interactor?.refreshFromNetwork()
+    func viewDidLoad() {
+        interactor?.loadTask()
     }
     
     func viewWillAppear() {
-        print("Presenter: Экран появляется, обновляю локальные данные...")
         interactor?.loadTask()
     }
+    
+    func showLoading() {
+        view?.showLoading()
+    }
+    
+    // MARK: - Task Actions
     
     func updateTaskCompletion(at index: Int, isCompleted: Bool) {
         guard index < tasks.count else { return }
@@ -55,70 +56,61 @@ class TaskListPresenter: TaskListPresenterProtocol {
         interactor?.updateTaskCompletion(task, isCompleted: isCompleted)
     }
     
-    func tasksLoadingFailed(_ error: any Error) {
-        view?.showError("Не удалось загрузить задачи: \(error.localizedDescription)")
-    }
-    
-    func tasksLoaded(_ tasks: [TodoItem]) {
-        print("Presenter: Получено \(tasks.count) задач")
-        self.tasks = tasks
-        self.allTodos = tasks
-        DispatchQueue.main.async{
-            self.view?.displayTasks(tasks)
-        }
-    }
-    
-    func showLoading() {
-        view?.showLoading()
-    }
-    
     func editTask(at index: Int) {
         guard index < tasks.count else { return }
         let selectedTask = tasks[index]
-        print("Presenter: Редактируем задачу - \(selectedTask.title)")
         router?.showTaskDetailsForEditing(selectedTask)
     }
     
     func didSelectTask(at index: Int) {
         guard index < tasks.count else { return }
         let selectedTask = tasks[index]
-        print("Presenter: Выбрана задача - \(selectedTask.title)")
         router?.showTaskDetails(selectedTask)
     }
     
     func deleteTask(at index: Int) {
         guard index < tasks.count else { return }
         let task = tasks[index]
-        print("Presenter: Удаляем задачу - \(task.title)")
         interactor?.deleteTask(task)
     }
     
     func createNewTask() {
-        print("Presenter: Создаем новую задачу")
         router?.showCreateTaskScreen()
     }
     
+    // MARK: - Data Management
+    
+    func refreshTasks() {
+        view?.showLoading()
+        interactor?.refreshFromNetwork()
+    }
+    
+    func tasksLoaded(_ tasks: [TodoItem]) {
+        self.tasks = tasks
+        self.allTodos = tasks
+        DispatchQueue.main.async {
+            self.view?.displayTasks(tasks)
+        }
+    }
+    
+    func tasksLoadingFailed(_ error: Error) {
+        view?.showError("Не удалось загрузить задачи: \(error.localizedDescription)")
+    }
+    
     func searchTasks(with query: String) {
-        print("Presenter: Searching tasks with query: '\(query)'")
-        
         if query.isEmpty {
-            self.todos = allTodos
             view?.displayTasks(allTodos)
         } else {
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                 guard let self = self else { return }
-                
-                print("🔍 Поиск выполняется в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
                 
                 let filteredTasks = allTodos.filter { task in
                     let titleMatch = task.title.lowercased().contains(query.lowercased())
                     let descriptionMatch = task.description?.lowercased().contains(query.lowercased()) ?? false
                     return titleMatch || descriptionMatch
                 }
-                print("🔍 Найдено \(filteredTasks.count) задач в фоне")
                 
                 DispatchQueue.main.async {
-                    self.todos = filteredTasks
                     self.view?.displayTasks(filteredTasks)
                 }
             }

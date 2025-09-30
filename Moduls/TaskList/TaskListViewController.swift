@@ -15,14 +15,15 @@ protocol TaskListViewControllerProtocol: AnyObject {
 
 class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     
+    // MARK: - Properties
+    
     var presenter: TaskListPresenterProtocol?
     private var tasks: [TodoItem] = []
     private let cellIdentifier = "TaskCell"
     
-    private let refreshControl: UIRefreshControl = {
-        $0.attributedTitle = NSAttributedString(string: "Загрузка из сети...")
-        return $0
-    }(UIRefreshControl())
+    // MARK: - UI Elements
+    
+    private let refreshControl = UIRefreshControl()
     
     private let titleLabel: UILabel = {
         $0.text = "Задачи"
@@ -60,13 +61,15 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         return $0
     }(UILabel())
     
-    private let addButton:UIButton = {
+    private let addButton: UIButton = {
         $0.setImage(UIImage(systemName: "square.and.pencil"), for: .normal)
         $0.tintColor = .systemBlue
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
         return $0
     }(UIButton())
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -79,6 +82,8 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         super.viewWillAppear(animated)
         presenter?.viewWillAppear()
     }
+    
+    // MARK: - Private Methods
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
@@ -105,7 +110,6 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     
     private func setupConstrains() {
         NSLayoutConstraint.activate([
-            
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
@@ -132,108 +136,12 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
         ])
     }
     
-    func displayTasks(_ tasks: [TodoItem]) {
-        self.tasks = tasks
-        DispatchQueue.main.async {
-            let searchText = self.searchTextField.text ?? ""
-            if searchText.isEmpty {
-                self.tasksCountLabel.text = "\(tasks.count) задач"
-            } else {
-                self.tasksCountLabel.text = "Найдено: \(tasks.count) из \(self.getTotalTasksCount())"
-            }
-            self.tableView.reloadData()
-            self.refreshControl.endRefreshing()
-            self.refreshControl.attributedTitle = NSAttributedString(string: "Последнее обновление: \(Date().formatted())")
-        }
-    }
-
     private func getTotalTasksCount() -> Int {
         return tasks.count
     }
     
-    func showLoading() {
-        refreshControl.beginRefreshing()
-    }
-    
-    func showError(_ message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-    }
-    
-    @objc private func addTaskTapped() {
-        presenter?.createNewTask()
-        print("Add task tapped")
-    }
-    
-    @objc private func refreshData() {
-        print("Refresh triggered")
-        presenter?.refreshTasks()
-    }
-    
-    @objc private func searchTextChanged() {
-        let searchText = searchTextField.text ?? ""
-        print("🔍 Пользователь ищет: '\(searchText)' в потоке: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
-        presenter?.searchTasks(with: searchText)
-    }
-}
-
-extension TaskListViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-}
-
-extension TaskListViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        return tasks.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! TaskCell
-        
-        let task = tasks[indexPath.row]
-        
-        cell.configure(with: task)
-        
-        cell.onCheckboxTapped = { [weak self] isCompleted in
-            self?.updateTaskCompletion(at: indexPath.row, isCompleted: isCompleted)
-        }
-        
-        return cell
-    }
-    
     private func updateTaskCompletion(at index: Int, isCompleted: Bool) {
         presenter?.updateTaskCompletion(at: index, isCompleted: isCompleted)
-    }
-}
-
-extension TaskListViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        presenter?.didSelectTask(at: indexPath.row)
-        tableView.deselectRow(at: indexPath, animated: true)
-    }
-    
-    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            
-            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
-                self.presenter?.editTask(at: indexPath.row)
-            }
-            
-            let shareAction = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-                self.shareTask(at: indexPath.row)
-            }
-            
-            let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
-                self.showDeleteConfirmation(for: indexPath.row)
-            }
-            
-            return UIMenu(title: "", children: [editAction, shareAction, deleteAction])
-        }
     }
     
     private func shareTask(at index: Int) {
@@ -282,5 +190,104 @@ extension TaskListViewController: UITableViewDelegate {
     
     private func deleteTask(at index: Int) {
         presenter?.deleteTask(at: index)
+    }
+    
+    // MARK: - TaskListViewControllerProtocol
+    
+    func displayTasks(_ tasks: [TodoItem]) {
+        self.tasks = tasks
+        DispatchQueue.main.async {
+            let searchText = self.searchTextField.text ?? ""
+            if searchText.isEmpty {
+                self.tasksCountLabel.text = "\(tasks.count) задач"
+            } else {
+                self.tasksCountLabel.text = "Найдено: \(tasks.count) из \(self.getTotalTasksCount())"
+            }
+            self.tableView.reloadData()
+            self.refreshControl.endRefreshing()
+            self.refreshControl.attributedTitle = NSAttributedString(string: "Последнее обновление: \(Date().formatted())")
+        }
+    }
+    
+    func showLoading() {
+        refreshControl.beginRefreshing()
+    }
+    
+    func showError(_ message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func addTaskTapped() {
+        presenter?.createNewTask()
+    }
+    
+    @objc private func refreshData() {
+        presenter?.refreshTasks()
+    }
+    
+    @objc private func searchTextChanged() {
+        let searchText = searchTextField.text ?? ""
+        presenter?.searchTasks(with: searchText)
+    }
+}
+
+// MARK: - UITextFieldDelegate
+
+extension TaskListViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+}
+
+// MARK: - UITableViewDataSource
+
+extension TaskListViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return tasks.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! TaskCell
+        
+        let task = tasks[indexPath.row]
+        cell.configure(with: task)
+        
+        cell.onCheckboxTapped = { [weak self] isCompleted in
+            self?.updateTaskCompletion(at: indexPath.row, isCompleted: isCompleted)
+        }
+        
+        return cell
+    }
+}
+
+// MARK: - UITableViewDelegate
+
+extension TaskListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        presenter?.didSelectTask(at: indexPath.row)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+                self.presenter?.editTask(at: indexPath.row)
+            }
+            
+            let shareAction = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { _ in
+                self.shareTask(at: indexPath.row)
+            }
+            
+            let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+                self.showDeleteConfirmation(for: indexPath.row)
+            }
+            
+            return UIMenu(title: "", children: [editAction, shareAction, deleteAction])
+        }
     }
 }
