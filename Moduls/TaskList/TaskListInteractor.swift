@@ -54,33 +54,24 @@ class TaskListInteractor: TaskListInteractorProtocol {
     }
     
     func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool) {
+        let updatedTask = TodoItem(
+            id: task.id,
+            title: task.title,
+            isCompleted: isCompleted,
+            userId: task.userId,
+            description: task.description
+        )
         
-        var currentTasks = storageService?.loadTodos() ?? []
+        storageService?.updateTaskOnly(updatedTask)
+        print("Interactor: Task completion updated - \(task.title): \(isCompleted)")
         
-        if let index = currentTasks.firstIndex(where: { $0.id == task.id }) {
-            let updatedTask = TodoItem(
-                id: task.id,
-                title: task.title,
-                isCompleted: isCompleted,
-                userId: task.userId,
-                description: task.description
-            )
-            
-            currentTasks[index] = updatedTask
-            
-            storageService?.saveTodos(currentTasks)
-            print("Interactor: Task completion updated - \(task.title): \(isCompleted)")
-            
-            presenter?.tasksLoaded(currentTasks)
-        }
+        let currentTasks = storageService?.loadTodos() ?? []
+        presenter?.tasksLoaded(currentTasks)
     }
     
     func deleteTask(_ task: TodoItem) {
-        var currentTasks = storageService?.loadTodos() ?? []
         
-        currentTasks.removeAll { $0.id == task.id }
-        
-        storageService?.saveTodos(currentTasks)
+        storageService?.deleteTask(task)
         print("Interactor: Задача удалена - \(task.title)")
         
         let updatedTasks = storageService?.loadTodos() ?? []

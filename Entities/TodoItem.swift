@@ -35,7 +35,7 @@ struct TodoItem: Codable {
         isCompleted = try container.decode(Bool.self, forKey: .isCompleted)
         userId = try container.decode(Int.self, forKey: .userId)
         createdAt = Date()
-        description = nil
+        description = try container.decode(String.self, forKey: .title)
     }
     
     enum CodingKeys: String, CodingKey {

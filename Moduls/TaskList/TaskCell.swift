@@ -61,29 +61,32 @@ class TaskCell: UITableViewCell {
     }
     
     private func setupConstraints() {
+        // Сначала создаем констрейнты
+        let descriptionHeightConstraint = descriptionLabel.heightAnchor.constraint(lessThanOrEqualToConstant: 40)
+        descriptionHeightConstraint.priority = .required
+        
+        let dateTopConstraint = dateLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 4)
+        dateTopConstraint.priority = .required
+        
         NSLayoutConstraint.activate([
-            
             checkButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             checkButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             checkButton.widthAnchor.constraint(equalToConstant: 24),
             checkButton.heightAnchor.constraint(equalToConstant: 24),
             
-            
             titleLabel.leadingAnchor.constraint(equalTo: checkButton.trailingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
             
-            
             descriptionLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             descriptionLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
             descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            
+            descriptionHeightConstraint,
             
             dateLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             dateLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
-            dateLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 4),
+            dateTopConstraint,
             dateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
-            
             
             separator.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             separator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),

@@ -8,6 +8,11 @@
 import Foundation
 
 class NetworkService: NetworkServiceProtocol {
+    
+    struct TodoResponse: Codable {
+        let todos: [TodoItem]
+    }
+    
     func fetchTodos(completion: @escaping (Result<[TodoItem], any Error>) -> Void) {
         
         let url = URL(string: "https://dummyjson.com/todos")!
@@ -30,9 +35,5 @@ class NetworkService: NetworkServiceProtocol {
                 completion(.failure(error))
             }
         }.resume()
-    }
-    
-    struct TodoResponse: Codable {
-        let todos: [TodoItem]
     }
 }

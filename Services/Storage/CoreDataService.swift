@@ -26,19 +26,62 @@ class CoreDataService: StorageServiceProtocol {
         return persistentContainer.viewContext
     }
     
+    private var isFirstLaunch: Bool {
+        get { !UserDefaults.standard.bool(forKey: "isDataLoaded") }
+        set { UserDefaults.standard.set(!newValue, forKey: "isDataLoaded") }
+    }
+    
+    
+    func saveNewTaskOnly(_ task: TodoItem) {
+        print("Saving ONLY ONE new task: \(task.title)")
+        saveNewTask(task)
+        saveContext()
+    }
+    
+    func updateTaskOnly(_ task: TodoItem) {
+        print("Updating ONLY ONE task: \(task.title)")
+        
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "TodoEntity")
+        request.predicate = NSPredicate(format: "id == %d", task.id)
+        
+        do {
+            let results = try context.fetch(request)
+            if let entity = results.first as? NSManagedObject {
+                // Обновляем только поля, НЕ трогаем дату создания!
+                entity.setValue(task.title, forKey: "title")
+                entity.setValue(task.isCompleted, forKey: "isCompleted")
+                entity.setValue(task.description, forKey: "taskDescription")
+                
+                let formatter = DateFormatter()
+                formatter.dateFormat = "HH:mm:ss"
+                let createdAt = entity.value(forKey: "createdAt") as? Date ?? Date()
+                print("UPDATING Task: '\(task.title)' - Keeping original date: \(formatter.string(from: createdAt))")
+            }
+            saveContext()
+        } catch {
+            print("CoreData: Error updating task - \(error)")
+        }
+    }
+    
     func saveTodos(_ todos: [TodoItem]) {
-        print("Saving \(todos.count) todos to CoreData")
+        print("Saving \(todos.count) todos to CoreData - FULL REPLACE")
         
-        deleteAllTodos()
-        
-        for todo in todos {
-            let entity = NSEntityDescription.insertNewObject(forEntityName: "TodoEntity", into: context)
-            entity.setValue(Int64(todo.id), forKey: "id")
-            entity.setValue(todo.title, forKey: "title")
-            entity.setValue(todo.isCompleted, forKey: "isCompleted")
-            entity.setValue(Int64(todo.userId), forKey: "userId")
-            entity.setValue(todo.createdAt, forKey: "createdAt")
-            entity.setValue(todo.description, forKey: "taskDescription")
+        if isFirstLaunch {
+            print("First launch - saving API tasks with old dates")
+            deleteAllTodos()
+            
+            for todo in todos {
+                let oldDate = Calendar.current.date(byAdding: .day, value: -Int.random(in: 1...30), to: Date())!
+                saveTaskWithDate(todo, date: oldDate)
+            }
+            
+            isFirstLaunch = false
+        } else {
+            print("Full replace - saving all tasks with current dates")
+            deleteAllTodos()
+            for todo in todos {
+                saveNewTask(todo)
+            }
         }
         
         saveContext()
@@ -49,9 +92,8 @@ class CoreDataService: StorageServiceProtocol {
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "TodoEntity")
         
-        let sortDescriptor = NSSortDescriptor(key: "id", ascending: true)
-        
-        request.sortDescriptors = [sortDescriptor]
+        let sortByDate = NSSortDescriptor(key: "createdAt", ascending: false)
+        request.sortDescriptors = [sortByDate]
         
         do {
             let results = try context.fetch(request)
@@ -65,15 +107,26 @@ class CoreDataService: StorageServiceProtocol {
                 let createdAt = entity.value(forKey: "createdAt") as? Date ?? Date()
                 let description = entity.value(forKey: "taskDescription") as? String
                 
-                var todo = TodoItem(
+                let formatter = DateFormatter()
+                formatter.dateFormat = "HH:mm:ss"
+                print("Task: '\(title)' - ID: \(id) - Created: \(formatter.string(from: createdAt))")
+                
+                let todo = TodoItem(
                     id: Int(id),
                     title: title,
                     isCompleted: isCompleted,
                     userId: Int(userId),
-                    description: description)
+                    description: description
+                )
                 
                 todos.append(todo)
             }
+            
+            print("=== FINAL ORDER ===")
+            for (index, todo) in todos.enumerated() {
+                print("\(index): \(todo.title)")
+            }
+            
             return todos
         } catch {
             print("CoreData: Error loading - \(error)")
@@ -92,6 +145,48 @@ class CoreDataService: StorageServiceProtocol {
         }
     }
     
+    private func deleteTask(with id: Int) {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "TodoEntity")
+        request.predicate = NSPredicate(format: "id == %d", id)
+        
+        do {
+            let results = try context.fetch(request)
+            for case let entity as NSManagedObject in results {
+                context.delete(entity)
+            }
+        } catch {
+            print("CoreData: Error deleting task - \(error)")
+        }
+    }
+    
+    private func saveTaskWithDate(_ task: TodoItem, date: Date) {
+        let entity = NSEntityDescription.insertNewObject(forEntityName: "TodoEntity", into: context)
+        entity.setValue(Int64(task.id), forKey: "id")
+        entity.setValue(task.title, forKey: "title")
+        entity.setValue(task.isCompleted, forKey: "isCompleted")
+        entity.setValue(Int64(task.userId), forKey: "userId")
+        entity.setValue(date, forKey: "createdAt")
+        entity.setValue(task.description, forKey: "taskDescription")
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        print("SAVING API Task: '\(task.title)' - Created: \(formatter.string(from: date))")
+    }
+    
+    private func saveNewTask(_ task: TodoItem) {
+        let entity = NSEntityDescription.insertNewObject(forEntityName: "TodoEntity", into: context)
+        entity.setValue(Int64(task.id), forKey: "id")
+        entity.setValue(task.title, forKey: "title")
+        entity.setValue(task.isCompleted, forKey: "isCompleted")
+        entity.setValue(Int64(task.userId), forKey: "userId")
+        entity.setValue(Date(), forKey: "createdAt")
+        entity.setValue(task.description, forKey: "taskDescription")
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        print("SAVING NEW Task: '\(task.title)' - Created: \(formatter.string(from: Date()))")
+    }
+    
     private func saveContext() {
         guard context.hasChanges else { return }
         
@@ -101,5 +196,10 @@ class CoreDataService: StorageServiceProtocol {
         } catch {
             print("CoreData: Error saving - \(error)")
         }
+    }
+
+    func deleteTask(_ task: TodoItem) {
+        deleteTask(with: task.id)
+        saveContext()
     }
 }

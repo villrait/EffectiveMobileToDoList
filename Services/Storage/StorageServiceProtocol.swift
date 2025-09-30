@@ -10,4 +10,7 @@ import Foundation
 protocol StorageServiceProtocol {
     func saveTodos(_ todos: [TodoItem])
     func loadTodos() -> [TodoItem]
+    func saveNewTaskOnly(_ task: TodoItem)
+    func updateTaskOnly(_ task: TodoItem)
+    func deleteTask(_ task: TodoItem)
 }
