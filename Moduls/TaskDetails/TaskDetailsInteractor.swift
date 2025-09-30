@@ -25,8 +25,16 @@ class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
                 userId: task.userId,
                 description: newDescription
             )
-            storageService?.saveNewTaskOnly(newTask)
-            print("Interactor: Новая задача создана - \(newTitle)")
+            
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                print("💾 Сохранение новой задачи в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+                self?.storageService?.saveNewTaskOnly(newTask)
+                
+                DispatchQueue.main.async {
+                    print("💾 Задача сохранена, возвращаемся в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+                    self?.presenter?.taskSavedSuccessfully()
+                }
+            }
             
         } else {
             let updatedTask = TodoItem(
@@ -36,10 +44,15 @@ class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
                 userId: task.userId,
                 description: newDescription
             )
-            storageService?.updateTaskOnly(updatedTask)
-            print("Interactor: Задача отредактирована - \(newTitle)")
+            
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                print("✏️ Сохранение редактирования в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+                self?.storageService?.updateTaskOnly(updatedTask)
+                
+                DispatchQueue.main.async {
+                    self?.presenter?.taskSavedSuccessfully()
+                }
+            }
         }
-        
-        presenter?.taskSavedSuccessfully()
     }
 }

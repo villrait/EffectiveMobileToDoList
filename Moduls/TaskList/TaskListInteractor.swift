@@ -79,11 +79,19 @@ class TaskListInteractor: TaskListInteractorProtocol {
     }
     
     func deleteTask(_ task: TodoItem) {
+        print("🗑️ Начинаем удаление задачи: \(task.title)")
         
-        storageService?.deleteTask(task)
-        print("Interactor: Задача удалена - \(task.title)")
         
-        let updatedTasks = storageService?.loadTodos() ?? []
-        presenter?.tasksLoaded(updatedTasks)
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            print("🗑️ Удаление задачи в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+            self?.storageService?.deleteTask(task)
+            
+            let updatedTasks = self?.storageService?.loadTodos() ?? []
+            
+            DispatchQueue.main.async{
+                print("🗑️ Удаление завершено, обновляем UI в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+                self?.presenter?.tasksLoaded(updatedTasks)
+            }
+        }
     }
 }

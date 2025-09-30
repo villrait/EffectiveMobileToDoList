@@ -59,7 +59,7 @@ class CoreDataService: StorageServiceProtocol {
     }
     
     func updateTaskOnly(_ task: TodoItem) {
-        print("Updating ONLY ONE task: \(task.title)")
+        print("✏️ Обновление задачи '\(task.title)' в Core Data, поток: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "TodoEntity")
         request.predicate = NSPredicate(format: "id == %d", task.id)
@@ -83,7 +83,7 @@ class CoreDataService: StorageServiceProtocol {
     }
     
     func saveTodos(_ todos: [TodoItem]) {
-        print("Saving \(todos.count) todos to CoreData - FULL REPLACE")
+        print("💾 Сохранение \(todos.count) задач в Core Data, поток: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
         
         if isFirstLaunch {
             print("First launch - saving API tasks with old dates")
@@ -206,6 +206,7 @@ class CoreDataService: StorageServiceProtocol {
     }
 
     func deleteTask(_ task: TodoItem) {
+        print("🗑️ Удаление задачи '\(task.title)' из Core Data, поток: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
         deleteTask(with: task.id)
         saveContext()
     }
