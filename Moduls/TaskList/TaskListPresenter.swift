@@ -105,14 +105,23 @@ class TaskListPresenter: TaskListPresenterProtocol {
             self.todos = allTodos
             view?.displayTasks(allTodos)
         } else {
-            let filteredTasks = allTodos.filter { task in
-                let titleMatch = task.title.lowercased().contains(query.lowercased())
-                let descriptionMatch = task.description?.lowercased().contains(query.lowercased()) ?? false
-                return titleMatch || descriptionMatch
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                guard let self = self else { return }
+                
+                print("🔍 Поиск выполняется в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+                
+                let filteredTasks = allTodos.filter { task in
+                    let titleMatch = task.title.lowercased().contains(query.lowercased())
+                    let descriptionMatch = task.description?.lowercased().contains(query.lowercased()) ?? false
+                    return titleMatch || descriptionMatch
+                }
+                print("🔍 Найдено \(filteredTasks.count) задач в фоне")
+                
+                DispatchQueue.main.async {
+                    self.todos = filteredTasks
+                    self.view?.displayTasks(filteredTasks)
+                }
             }
-            self.todos = filteredTasks
-            print("Presenter: Found \(filteredTasks.count) tasks matching '\(query)'")
-            view?.displayTasks(filteredTasks)
         }
     }
     

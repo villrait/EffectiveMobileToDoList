@@ -18,7 +18,6 @@ class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
     func saveTask(_ task: TodoItem, newTitle: String, newDescription: String?, newIsCompleted: Bool) {
         
         if task.title.isEmpty {
-            // НОВАЯ ЗАДАЧА
             let newTask = TodoItem(
                 id: Int.random(in: 1000...9999),
                 title: newTitle,
@@ -30,7 +29,6 @@ class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
             print("Interactor: Новая задача создана - \(newTitle)")
             
         } else {
-            // РЕДАКТИРОВАНИЕ - используем метод обновления одной задачи
             let updatedTask = TodoItem(
                 id: task.id,
                 title: newTitle,
@@ -38,7 +36,6 @@ class TaskDetailsInteractor: TaskDetailsInteractorProtocol {
                 userId: task.userId,
                 description: newDescription
             )
-            // Этот метод должен обновлять updatedAt
             storageService?.updateTaskOnly(updatedTask)
             print("Interactor: Задача отредактирована - \(newTitle)")
         }

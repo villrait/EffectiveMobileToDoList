@@ -20,11 +20,9 @@ class TaskListInteractor: TaskListInteractorProtocol {
     var storageService: StorageServiceProtocol?
     
     func updateTaskCompletion(_ task: TodoItem, isCompleted: Bool) {
-        // Используем новый метод
         storageService?.updateTaskCompletion(task, isCompleted: isCompleted)
         print("Interactor: Task completion updated - \(task.title): \(isCompleted)")
         
-        // Обновляем список
         let currentTasks = storageService?.loadTodos() ?? []
         presenter?.tasksLoaded(currentTasks)
     }
@@ -45,20 +43,37 @@ class TaskListInteractor: TaskListInteractorProtocol {
     
     func refreshFromNetwork() {
         print("Interactor: Полная перезагрузка из сети...")
+        print("📱 Текущий поток: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
         
-        networkService?.fetchTodos { [weak self] result in
-            switch result {
-            case .success(let tasks):
-                print("Interactor: Получено \(tasks.count) задач из API")
-                self?.storageService?.saveTodos(tasks)
-                let updateTasks = self?.storageService?.loadTodos() ?? []
-                self?.presenter?.tasksLoaded(updateTasks)
+        DispatchQueue.main.async {
+            print("🔄 Показываем спиннер в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+            self.presenter?.showLoading()
+        }
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            print("🌐 Сетевой запрос в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+            
+            self.networkService?.fetchTodos { [weak self] result in
+                print("📥 Получили ответ в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
                 
-            case .failure(let error):
-                print("Interactor: Ошибка загрузки: \(error)")
-                let localTasks = self?.storageService?.loadTodos() ?? []
-                self?.presenter?.tasksLoaded(localTasks)
-                
+                switch result {
+                case .success(let tasks):
+                    print("Interactor: Получено \(tasks.count) задач из API")
+                    self?.storageService?.saveTodos(tasks)
+                    let updateTasks = self?.storageService?.loadTodos() ?? []
+                    
+                    DispatchQueue.main.async {
+                        print("🎨 Обновляем UI в: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
+                        self?.presenter?.tasksLoaded(updateTasks)
+                    }
+                    
+                case .failure(let error):
+                    print("Interactor: Ошибка загрузки: \(error)")
+                    DispatchQueue.main.async {
+                        let localTasks = self?.storageService?.loadTodos() ?? []
+                        self?.presenter?.tasksLoaded(localTasks)
+                    }
+                }
             }
         }
     }

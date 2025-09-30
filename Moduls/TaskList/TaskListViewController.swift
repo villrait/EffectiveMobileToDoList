@@ -173,6 +173,7 @@ class TaskListViewController: UIViewController, TaskListViewControllerProtocol {
     
     @objc private func searchTextChanged() {
         let searchText = searchTextField.text ?? ""
+        print("🔍 Пользователь ищет: '\(searchText)' в потоке: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
         presenter?.searchTasks(with: searchText)
     }
 }
